@@ -33,3 +33,5 @@ use the editor.
 
 - The game is a single self-contained HTML file at `public/game/index.html`, embedded full-screen by `src/routes/index.tsx` via a same-origin iframe. Why: it relies on globals, inline `onclick` menus, localStorage saves and pointer lock, which break if split into React modules.
 - Game media (songs `MenuSong.mp3`, `Music1-4.mp3`; face PNGs) is loaded by relative filename, so it must live beside the game in `public/game/`. Why: the game resolves `new Audio(name + '.mp3')` and `name + '.png'` relative to its own page.
+- Game changes are added as a new `<script>` "vN patch" block at the end of `public/game/index.html` that wraps or redefines earlier globals (`const _x=fn;fn=function(){...}`); only tiny hooks are edited in earlier blocks. Why: the game is a stack of minified patches that call each other by global name, so wrapping keeps older behavior intact.
+- Fields that must survive saves go through `window.zx()` (merged into the save in the v2 `sv`) and are re-applied in the newest `go` wrapper. Why: older `go` wrappers reset fields after the save is loaded.

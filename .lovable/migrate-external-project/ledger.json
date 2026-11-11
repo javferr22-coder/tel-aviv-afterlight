@@ -1,0 +1,12 @@
+{
+  "source": "code-archive: gta6-tel-aviv-game.zip (single file gta6-tel-aviv-game.html)",
+  "capabilities": [
+    {"capability": "code", "source": "Self-contained canvas game in one HTML file (inline CSS + 10 script patches, global functions, inline onclick menus)", "outcome": "Preserved byte-for-byte as a static page, embedded full-screen on the home page", "status": "verified", "next_action": "none"},
+    {"capability": "routes", "source": "Single page", "outcome": "Home page shows the game", "status": "verified", "next_action": "none"},
+    {"capability": "save data", "source": "Browser localStorage (key gta6tlv, daily bonus key dly)", "outcome": "Kept in the player's browser; same-origin embed keeps it working", "status": "verified", "next_action": "none"},
+    {"capability": "schema / records / auth / authorization", "source": "None (no backend, no accounts, no network calls)", "outcome": "Not applicable", "status": "verified", "next_action": "none"},
+    {"capability": "media assets", "source": "Game loads MenuSong.mp3, Music1-4.mp3 and faces Cameron/Mustapha/AJ/Isaiah/Jack/Javier.png from beside the HTML file; none were in the archive", "outcome": "Game runs without them (silent, plain faces); add files to public/game/ when supplied", "status": "pending", "next_action": "User uploads the 5 songs and 6 face pictures"},
+    {"capability": "external providers / endpoints / webhooks / schedules / secrets", "source": "None detected", "outcome": "Not applicable", "status": "verified", "next_action": "none"},
+    {"capability": "cutover", "source": "Unknown previous hosting", "outcome": "Publish from Lovable", "status": "pending", "next_action": "User publishes when ready"}
+  ]
+}

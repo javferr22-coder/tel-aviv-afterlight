@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- The game is a single self-contained HTML file at `public/game/index.html`, embedded full-screen by `src/routes/index.tsx` via a same-origin iframe. Why: it relies on globals, inline `onclick` menus, localStorage saves and pointer lock, which break if split into React modules.
+- Game media (songs `MenuSong.mp3`, `Music1-4.mp3`; face PNGs) is loaded by relative filename, so it must live beside the game in `public/game/`. Why: the game resolves `new Audio(name + '.mp3')` and `name + '.png'` relative to its own page.

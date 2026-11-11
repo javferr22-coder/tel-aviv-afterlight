@@ -567,7 +567,7 @@ const _dc9=drawCar;drawCar=function(o){if(o.ty==6)return _dc9(o);const T=CT[o.ty
   if(sp){q(0,-2,.9,.15,1.2,1.25,c);[-.6,.6].forEach(u=>q(u,-2,.05,.05,.95,1.2,'#111111'));q(0,0,.15,2.31,.96,.97,'#ffffff')}
   if(ty==3){q(-.25,-.15,.25,.2,1.65,1.8,fl?'#ff2222':'#2255ff');q(.25,-.15,.25,.2,1.65,1.8,fl?'#2255ff':'#ff2222');[-1,1].forEach(u=>q(u,0,.03,1.1,.4,.9,'#f0f0f0'))}}
  pts.sort((p,r)=>r[0]-p[0]);pts.forEach(p=>p[1]());
- if(nf<.65&&o.hp>0)[-.6,.6].forEach(u=>{const x=o.x+(rx*u+fx*2.4)*s,z=o.z+(rz*u+fz*2.4)*s,p=pj(x,.8,z);if(p[2]>1){g.fillStyle='rgba(255,240,170,.55)';g.beginPath();g.arc(p[0],p[1],Math.max(3,1.6*F/p[2]),0,7);g.fill()}})};
+ if(nf<.65&&o.hp>0)[-.6,.6].forEach(u=>{const x=o.x+(rx*u+fx*2.4)*s,z=o.z+(rz*u+fz*2.4)*s,p=pj(x,.8,z);if(p[2]>1){g.fillStyle='rgba(255,240,170,.55)';g.beginPath();g.arc(p[0],p[1],Math.min(26,Math.max(3,1.6*F/p[2])),0,7);g.fill()}})};
 // ---- interiors you can walk into
 function enterB(b){if(P.car)return say('Get out of the car first');Z.in=b;Z.ox=P.x;Z.oz=P.z;Z.oa=P.a;P.x=0;P.z=-8;P.a=0;cyaw=0;cpt=0;say('Welcome to '+b.n+'. Walk to the counter and press E. Leave through the door.')}
 function exitB(){P.x=Z.ox;P.z=Z.oz;cyaw=Z.oa;Z.in=null;say('You step back outside.')}
@@ -681,7 +681,7 @@ const _dc12=drawCar;drawCar=function(o){const ty=o.ty;if(!(ty==1||ty==5||ty>=7&&
  [-.7,.7].forEach(u=>{q(u,L+.01,sup?.3:.22,.05,.5,sup?.62:.8,sup?'#c8f4ff':'#fff6c0');if(ty!=5)q(u,-L-.02,.22,.05,.55,.7,'#e02020')});
  if(hi){[-1,1].forEach(u=>q(u*(W2+.05),.6,.1,.06,ht+.15,ht+.3,c));q(0,-L-.08,.3,.02,.45,.6,'#f4f4f4')}
  pts.sort((p,r)=>r[0]-p[0]);pts.forEach(p=>p[1]());
- if(nf<.65&&o.hp>0)[-.6,.6].forEach(u=>{const x=o.x+(rx*u+fx*(L+.1))*s,z=o.z+(rz*u+fz*(L+.1))*s,p=pj(x,.8,z);if(p[2]>1){g.fillStyle='rgba(255,240,170,.55)';g.beginPath();g.arc(p[0],p[1],Math.max(3,1.6*F/p[2]),0,7);g.fill()}})};
+ if(nf<.65&&o.hp>0)[-.6,.6].forEach(u=>{const x=o.x+(rx*u+fx*(L+.1))*s,z=o.z+(rz*u+fz*(L+.1))*s,p=pj(x,.8,z);if(p[2]>1){g.fillStyle='rgba(255,240,170,.55)';g.beginPath();g.arc(p[0],p[1],Math.min(26,Math.max(3,1.6*F/p[2])),0,7);g.fill()}})};
 const _mk=mkcar;mkcar=function(x,z,ty,a){return Z.in?_mk(Z.ox+x-P.x,Z.oz+z-P.z,ty,a):_mk(x,z,ty,a)};
 function bh2(ty,p,hp){if(pay(p)){const c=mkcar(P.x+sin(P.a)*7,P.z+cos(P.a)*7,ty,P.a);c.own=1;c.hp=hp;cars.push(c);say('Delivered to your door!')}closeM()}
 const _sh10=shop;shop=function(b){_sh10(b);if(b.k=='car')M.innerHTML=M.innerHTML.replace('<button onclick="closeM()">Leave</button>',()=>'<button onclick="bh2(7,15000,140)">Muscle $15,000</button><button onclick="bh2(8,28000,180)">Luxury $28,000</button><button onclick="bh2(9,60000,120)">Supercar $60,000</button><button onclick="closeM()">Leave</button>')};
@@ -732,5 +732,267 @@ const _hu12=hud;hud=function(){_hu12();const zn=P.x>5.5*SZ?'Negev County':(P.x>P
  if(Z.cop){g.textAlign='left';g.font='bold 13px Arial';g.fillStyle='#8fb4ff';g.fillText('ON DUTY · calls answered '+(Z.rk|0),20,84)}
  if(Z.dc>1){g.textAlign='center';g.font='900 36px Impact';g.fillStyle='#ffd23f';g.fillText('DRIFT '+Z.dc.toFixed(1)+'s',W/2,H*.2)}};
 const _se12=settings;settings=function(){_se12();M.innerHTML=M.innerHTML.replace('<button onclick="back()">Back</button>',()=>'<button onclick="S.hc^=1;settings()">Permadeath (dying erases progress): '+(S.hc?'ON':'OFF')+'</button><button onclick="back()">Back</button>')};
+
+</script><script>
+// ===== v11 patch: Tel Aviv & Negev overhaul =====
+// ---- helpers
+var NC=0;
+function srand(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+const ip=(i,j)=>({x:(i-.5)*SZ,z:(j-.5)*SZ}),inNegev=o=>o.x>5.5*SZ,inPark=o=>o.x>PK.i0*SZ-B/2&&o.x<PK.i1*SZ+B/2&&o.z>PK.j0*SZ-B/2&&o.z<PK.j1*SZ+B/2;
+function spawnN(){let p;do{p=spawnPos()}while(p.x<6*SZ);return p}
+const ILS=t=>typeof t=='string'?t.replace(/\$(?=[0-9])/g,'₪'):t;
+// shekels in every menu
+new MutationObserver(ms=>{for(const m of ms)m.addedNodes.forEach(function f(n){if(n.nodeType==3){if(n.data.indexOf('$')>=0)n.data=ILS(n.data)}else n.childNodes&&n.childNodes.forEach(f)})}).observe(M,{childList:true,subtree:true});
+// ---- Israel + GTA flavour: names, ads, radio
+ADS.length=0;ADS.push('Bamba-Nation: Puffs for Patriots','Sprunk Gazoz: Now Kosher','Hummus Shot: Dip Responsibly','Fleeca Bank Le-Umi: We Know Your Money','Ammu-Nation Tel Aviv: Licensed (Mostly)','Big Yahu Falafel: Bite the Big One!','Weazel News: Yalla, Stay Tuned','Cluckin Shuk: Schnitzel 24/7');
+bb.forEach(o=>o.t=pick(ADS));
+STN[1]='Kikar FM 102 (pop)';STN[2]='Shuk Beats 99.5 (Mizrahi)';STN[3]='Jaffa Jazz 88.1';STN[4]='Dizengoff Disco 104';
+const HE={gear:'נשק וציוד',car:'מוסך',spk:'רמקולים',chop:'גרוטאות',bank:'בנק',job:'לשכת עבודה',pd:'משטרת ישראל'};
+const _sign11=sign;sign=function(b){_sign11(b);if(cz<b.z1)return;const d=door(b),p=pj(d.x,Math.min(b.h-1.5,8)-1.7,b.z1+.1);if(p[2]>1.5&&p[2]<120){const s=2.2*F/p[2];if(s>6){g.font='bold '+s+'px Arial';g.textAlign='center';g.fillStyle='#ffe27a';g.fillText(b.k=='food'?(b.n.indexOf('Shawarma')>=0?'שווארמה':'פלאפל'):HE[b.k]||'',p[0],p[1])}}};
+// ---- Police HQ (join the police here or from the phone)
+(()=>{let best=null,bd=1e9;bl.forEach(b=>{if(b.k!='job'||b.x0>5*SZ)return;const d=Math.hypot(b.x0+20,b.z0+49);if(d<bd){bd=d;best=b}});if(best)Object.assign(best,{k:'pd',n:'Police HQ',c:'#dfe4ec',h:22})})();
+KC.pd='#3a6bff';KL.pd='P';
+// ---- landmarks: Azrieli Center (downtown) and the Jaffa Clock Tower
+const LMB=[];
+for(let k=bl.length-1;k>=0;k--){const b=bl[k];if(b.k=='base'||b.k=='pd')continue;const i=Math.round((b.x0+b.x1)/2/SZ),j=Math.round((b.z0+b.z1)/2/SZ);if(i==5&&j==5||i==1&&j==10)bl.splice(k,1)}
+LMB.push({x0:5*SZ-24,x1:5*SZ-6,z0:5*SZ-24,z1:5*SZ-6,h:150},{x0:5*SZ+7,x1:5*SZ+23,z0:5*SZ-23,z1:5*SZ-7,h:140},{x0:5*SZ-9,x1:5*SZ+9,z0:5*SZ+8,z1:5*SZ+26,h:125},{x0:SZ-5,x1:SZ+5,z0:10*SZ-5,z1:10*SZ+5,h:26});
+const _col11=col;col=function(o,r,y){for(const b of LMB)if((y||0)<b.h&&o.x>b.x0-r&&o.x<b.x1+r&&o.z>b.z0-r&&o.z<b.z1+r){const dx=Math.min(o.x-b.x0+r,b.x1+r-o.x),dz=Math.min(o.z-b.z0+r,b.z1+r-o.z);if(dx<dz)o.x+=o.x<(b.x0+b.x1)/2?-dx:dx;else o.z+=o.z<(b.z0+b.z1)/2?-dz:dz;return 1}return _col11(o,r,y)};
+function prism(x,z,r,n,rot,y0,y1,c,glass){const V=[];for(let k=0;k<n;k++){const a=rot-k*2*PI/n;V.push([x+sin(a)*r,z+cos(a)*r])}const near=Math.hypot(x-cx,z-cz)<380;
+ for(let i=0;i<n;i++){const p=V[i],q=V[(i+1)%n],nx=q[1]-p[1],nz=p[0]-q[0];if((cx-p[0])*nx+(cz-p[1])*nz<=0)continue;const f=.65+.35*(nx*.6+nz*.8)/Math.hypot(nx,nz);poly([[p[0],y0,p[1]],[q[0],y0,q[1]],[q[0],y1,q[1]],[p[0],y1,p[1]]],sh(c,f));
+  if(glass&&near)for(let y=y0+5,j=0;y<y1-2;y+=6,j++){const lit=nf<.7&&(i*5+j*3)%4<2;poly([[p[0],y,p[1]],[q[0],y,q[1]],[q[0],y+2,q[1]],[p[0],y+2,p[1]]],lit?'#ffe3a0':sh('#1b2a3a',f))}}
+ if(cy>y1)poly(V.map(p=>[p[0],y1,p[1]]),sh(c,1))}
+function pyramid(x,z,r,y0,y1,c){const V=[[x-r,z-r],[x+r,z-r],[x+r,z+r],[x-r,z+r]];for(let i=0;i<4;i++){const p=V[i],q=V[(i+1)%4],nx=q[1]-p[1],nz=p[0]-q[0];if((cx-p[0])*nx+(cz-p[1])*nz>0)poly([[p[0],y0,p[1]],[q[0],y0,q[1]],[x,y1,z]],sh(c,.7+.3*(nx*.6+nz*.8)/Math.hypot(nx,nz)))}}
+function label(x,y,z,t,sz,c){const p=pj(x,y,z);if(p[2]>2&&p[2]<400){const s=Math.max(10,sz*F/p[2]);g.font='bold '+s+'px '+(/[\u0590-\u05FF]/.test(t)?'Arial':'Anton,Impact');g.textAlign='center';g.lineWidth=s/7;g.strokeStyle='#000';g.fillStyle=c||'#fff';g.strokeText(t,p[0],p[1]);g.fillText(t,p[0],p[1])}}
+function azrieli(){const X=5*SZ,Zc=5*SZ;poly([[X-B/2,.02,Zc-B/2],[X+B/2,.02,Zc-B/2],[X+B/2,.02,Zc+B/2],[X-B/2,.02,Zc+B/2]],sh('#b8b4ac',1));
+ const T=[[X-15,Zc-15,()=>prism(X-15,Zc-15,12,12,0,0,150,'#9fb4c6',1)],[X+15,Zc-15,()=>prism(X+15,Zc-15,13,3,PI,0,140,'#a9bccb',1)],[X,Zc+17,()=>prism(X,Zc+17,12,4,PI/4,0,125,'#b3c3cf',1)]];
+ T.sort((a,b)=>Math.hypot(b[0]-cx,b[1]-cz)-Math.hypot(a[0]-cx,a[1]-cz)).forEach(t=>t[2]());obox(X,Zc,14,6,0,14,0,'#c9cfd6');label(X,17,Zc,'AZRIELI CENTER',2.6);label(X,14.5,Zc,'מרכז עזריאלי',1.8)}
+function clockTower(){const X=SZ,Zc=10*SZ;poly([[X-B/2,.02,Zc-B/2],[X+B/2,.02,Zc-B/2],[X+B/2,.02,Zc+B/2],[X-B/2,.02,Zc+B/2]],sh('#cdb48a',1));
+ obox(X,Zc,4.5,4.5,0,15,0,'#d9c49a');obox(X,Zc,3.6,3.6,15,22,0,'#e2cfa6');obox(X,Zc,4,4,22,22.6,0,'#c7b088');pyramid(X,Zc,3.2,22.6,27,'#b89a6a');
+ [[0,4.6],[0,-4.6],[4.6,0],[-4.6,0]].forEach(([u,v])=>{if((cx-X)*u+(cz-Zc)*v<=0)return;const p=pj(X+u*.8,18.5,Zc+v*.8);if(p[2]<2)return;const r=2.3*F/p[2];g.fillStyle='#f6f1e4';g.strokeStyle='#3a2a1a';g.lineWidth=Math.max(1,r/8);g.beginPath();g.arc(p[0],p[1],r,0,7);g.fill();g.stroke();
+  const hA=(tm%12)/12*2*PI,mA=(tm%1)*2*PI;g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(p[0]+sin(hA)*r*.5,p[1]-cos(hA)*r*.5);g.moveTo(p[0],p[1]);g.lineTo(p[0]+sin(mA)*r*.8,p[1]-cos(mA)*r*.8);g.stroke()});
+ label(X,29,Zc,'JAFFA CLOCK TOWER',1.8,'#ffe27a')}
+// ---- sky: sun, clouds, stars
+const CLD=[...Array(14)].map((_,i)=>({a:i/14*2*PI+R()*.3,e:rnd(.08,.3),w:rnd(.6,1.4)})),STR=[...Array(120)].map(()=>({a:rnd(0,6.3),e:rnd(.02,.9)}));
+function skyDir(a,e){const dx=sin(a),dz=cos(a),rx=dx*cos(ca)-dz*sin(ca),rz=dx*sin(ca)+dz*cos(ca);if(rz<=.05)return null;return[W/2+rx/rz*F,HZ-Math.tan(e)/rz*F]}
+window.skyx=function(){if(Z.in)return;const t=(tm-6)/12,day=t>0&&t<1;
+ if(nf<.6){g.fillStyle='rgba(255,255,255,'+(.6-nf)*1.4+')';STR.forEach(s=>{const p=skyDir(s.a,s.e);if(p&&p[1]<HZ)g.fillRect(p[0],p[1],1.5,1.5)})}
+ if(day){const el=sin(t*PI)*.9;
+  // sun moves from east (+x) through south to west (-x, over the sea)
+  const q=skyDir(PI/2+t*PI,el);if(q){const r=H*.05,gr=g.createRadialGradient(q[0],q[1],r*.3,q[0],q[1],r*5);gr.addColorStop(0,'rgba(255,250,220,.95)');gr.addColorStop(.25,'rgba(255,220,150,.45)');gr.addColorStop(1,'rgba(255,200,120,0)');g.fillStyle=gr;g.fillRect(q[0]-r*5,q[1]-r*5,r*10,r*10);g.fillStyle='#fffbe8';g.beginPath();g.arc(q[0],q[1],r*.55,0,7);g.fill()}}
+ const dr=performance.now()/9e5;CLD.forEach(c=>{const p=skyDir(c.a+dr,c.e);if(!p||p[1]>HZ)return;const s=H*.09*c.w;g.fillStyle='rgba(255,255,255,'+(.18+.4*nf)+')';for(let k=0;k<4;k++){g.beginPath();g.ellipse(p[0]+(k-1.5)*s*.55,p[1]+(k%2)*s*.12,s*.5,s*.22,0,0,7);g.fill()}})};
+// ---- world decoration: beach, park, Negev
+const PALMS=[],UMB=[],HUTS=[],FLAGS=[],CAC=[],CAMELS=[],BENCH=[],LAMPS=[];
+{const r=srand(77);for(let z=-SZ;z<N*SZ;z+=26)PALMS.push({x:-60,z:z+r()*6});for(let z=-SZ+10;z<N*SZ;z+=14)UMB.push({x:-78-r()*20,z:z+r()*8,c:['#ff2d95','#0038b8','#ffd23f','#ffffff','#ff7a18'][r()*5|0]});
+ for(let z=40;z<N*SZ;z+=220)HUTS.push({x:-92,z});for(let z=60;z<N*SZ;z+=130)FLAGS.push({x:-58,z});for(let j=0;j<=N;j++)FLAGS.push({x:5.5*SZ,z:(j-.5)*SZ+RD/2+3});
+ for(let i=CNT;i<N;i++)for(let j=0;j<N;j++)for(let k=0;k<2;k++){const x=i*SZ+(r()<.5?-1:1)*(B/2+2.5),z=j*SZ+(r()-.5)*60;CAC.push({x,z,h:2+r()*2.5})}
+ for(let k=0;k<12;k++){const x=6*SZ+r()*5*SZ,z=r()*11*SZ;CAMELS.push({x:(Math.round(x/SZ-.5)+.5)*SZ+((r()-.5)*10),z,a:r()*6,t:0,ph:0})}
+ const c=3*SZ,d=7*SZ;for(let k=-2;k<=2;k++){if(!k)continue;BENCH.push({x:c+5,z:d+k*14,a:0},{x:c-5,z:d+k*14,a:0},{x:c+k*14,z:d+5,a:PI/2});LAMPS.push({x:c+4,z:d+k*14+6},{x:c+k*14+6,z:d-4})}}
+function palm(t){obox(t.x,t.z,.3,.3,0,9,.3,'#8a6a42');for(let k=0;k<5;k++){const a=k*1.26+t.z;obox(t.x+sin(a)*1.6,t.z+cos(a)*1.6,.35,1.8,8.6,9,a,'#2f8a3a')}}
+function flag(f){obox(f.x,f.z,.12,.12,0,11,0,'#dddddd');poly([[f.x,8,f.z],[f.x,8,f.z+4],[f.x,10.8,f.z+4],[f.x,10.8,f.z]],sh('#ffffff',1));[[8.3,8.6],[10.2,10.5]].forEach(([a,b])=>poly([[f.x,a,f.z],[f.x,a,f.z+4],[f.x,b,f.z+4],[f.x,b,f.z]],sh('#0038b8',1)));
+ const p=pj(f.x,9.4,f.z+2);if(p[2]>2&&p[2]<120){const r=.55*F/p[2];g.strokeStyle='#0038b8';g.lineWidth=Math.max(1,r/4);[0,PI].forEach(o=>{g.beginPath();for(let k=0;k<3;k++){const a=o+k*2*PI/3-PI/2;g[k?'lineTo':'moveTo'](p[0]+cos(a)*r,p[1]+sin(a)*r)}g.closePath();g.stroke()})}}
+function camel(m){const a=m.a,fx=sin(a),fz=cos(a),sw=sin(m.ph)*.25,P2=(f,hw,hl,y0,y1,c,r2)=>obox(m.x+fx*f+cos(a)*(r2||0),m.z+fz*f-sin(a)*(r2||0),hw,hl,y0,y1,a,c);
+ [[.7,-.3,1],[.7,.3,-1],[-.7,-.3,-1],[-.7,.3,1]].forEach(([f,r2,s])=>P2(f+sw*s,.12,.12,0,1.4,'#b88d52',r2));P2(0,.45,1,1.4,2.1,'#c8a165');P2(0,.35,.4,2.1,2.6,'#c09558');P2(1.2,.15,.35,1.9,2.9,'#c8a165');P2(1.5,.18,.35,2.75,3.1,'#c8a165')}
+function cactus(c){obox(c.x,c.z,.3,.3,0,c.h,0,'#3f7f3a');obox(c.x+.6,c.z,.18,.18,c.h*.45,c.h*.75,0,'#3f7f3a');obox(c.x-.5,c.z,.18,.18,c.h*.3,c.h*.6,0,'#3f7f3a')}
+function glow(x,z,r,c){const p=pj(x,.05,z);if(p[2]<1)return;const s=r*F/p[2],gr=g.createRadialGradient(p[0],p[1],0,p[0],p[1],s);gr.addColorStop(0,c);gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.beginPath();g.ellipse(p[0],p[1],s,s*.4,0,0,7);g.fill()}
+const _xt11=xtra;xtra=function(it,dc,RV){_xt11(it,dc,RV);const near=(o,r)=>{const e=dc(o);if(e<(r||RV))return e+.01;return -1};
+ // beach sand, waves
+ it.push([1.25e5,()=>{const z0=cz-RV,z1=cz+RV;poly([[-63,.01,z0],[-112,.01,z0],[-112,.01,z1],[-63,.01,z1]],sh('#e9d6a3',1));poly([[-63,.015,z0],[-66,.015,z0],[-66,.015,z1],[-63,.015,z1]],sh('#cbbd94',1));
+  const t=performance.now()/1400;for(let k=0;k<4;k++){const x=-114-k*9-((t+k*.25)%1)*6;poly([[x,.02,z0],[x-.8,.02,z0],[x-.8,.02,z1],[x,.02,z1]],'rgba(255,255,255,'+(.35-k*.07)+')')}}]);
+ PALMS.forEach(t=>{const e=near(t,RV*.8);if(e>0)it.push([e,()=>palm(t)])});
+ UMB.forEach(u=>{const e=near(u,170);if(e>0)it.push([e,()=>{obox(u.x,u.z,.08,.08,0,2.6,0,'#eeeeee');pyramid(u.x,u.z,1.8,2.3,3.1,u.c);obox(u.x+1.2,u.z+.4,.9,.4,0,.15,0,'#f4f4f4')}])});
+ HUTS.forEach(h=>{const e=near(h,RV);if(e>0)it.push([e,()=>{[[-1.6,-1.6],[1.6,-1.6],[-1.6,1.6],[1.6,1.6]].forEach(([u,v])=>obox(h.x+u,h.z+v,.15,.15,0,2.4,0,'#aaaaaa'));obox(h.x,h.z,2.2,2.2,2.4,5,0,'#f2f2f2');obox(h.x,h.z,2.5,2.5,5,5.4,0,'#d33a2a');label(h.x,6.4,h.z,'LIFEGUARD',1,'#ff4040');label(h.x,5.6,h.z,'מציל',.8,'#ffffff')}])});
+ FLAGS.forEach(f=>{const e=near(f,170);if(e>0)it.push([e,()=>flag(f)])});
+ // Negev County: cacti, camels, dunes, kibbutz water tower
+ CAC.forEach(c=>{const e=near(c,150);if(e>0)it.push([e,()=>cactus(c)])});
+ CAMELS.forEach(m=>{const e=near(m,150);if(e>0)it.push([e,()=>camel(m)])});
+ if(cx>4*SZ)for(let k=0;k<14;k++){const z=k*SZ-SZ,x=(N-.5)*SZ+30+(k%3)*25,e=Math.hypot(x-cx,z-cz);if(e<RV*2)it.push([e+40,()=>{poly([[x,0,z-55],[x+10,22+(k%4)*6,z],[x,0,z+55]],sh(k%2?'#d9b97a':'#cfae6c',1))}])}
+ {const x=(N-.5)*SZ+12,z=4*SZ,e=Math.hypot(x-cx,z-cz);if(e<RV*1.6)it.push([e,()=>{[[-2,-2],[2,-2],[-2,2],[2,2]].forEach(([u,v])=>obox(x+u,z+v,.2,.2,0,14,0,'#777777'));prism(x,z,3.6,10,0,14,20,'#d8d8d0');label(x,22,z,'KIBBUTZ NEGEV',1.6,'#ffe27a')}])}
+ // Yarkon Park: benches, lamps, gate
+ BENCH.forEach(b=>{const e=near(b,120);if(e>0)it.push([e,()=>{obox(b.x,b.z,.35,1.2,.45,.6,b.a,'#7a5230');obox(b.x+cos(b.a)*.35,b.z-sin(b.a)*.35,.06,1.2,.6,1.1,b.a,'#7a5230')}])});
+ LAMPS.forEach(l=>{const e=near(l,140);if(e>0)it.push([e,()=>{obox(l.x,l.z,.08,.08,0,4.2,0,'#2a2a2a');obox(l.x,l.z,.25,.25,4.2,4.6,0,nf<.65?'#fff2b0':'#dddddd');if(nf<.65)glow(l.x,l.z,6,'rgba(255,230,150,.45)')}])});
+ {const x=PK.i0*SZ-B/2-3,z=7*SZ,e=Math.hypot(x-cx,z-cz);if(e<RV)it.push([e,()=>{obox(x,z-6,.4,.4,0,6,0,'#3a5a2a');obox(x,z+6,.4,.4,0,6,0,'#3a5a2a');poly([[x,4.5,z-6],[x,4.5,z+6],[x,6,z+6],[x,6,z-6]],'#2f6f2a');label(x,5.6,z,'YARKON PARK',1.1,'#ffffff');label(x,4.7,z,'פארק הירקון',.8,'#ffffff')}])}
+ // landmarks
+ {const e=Math.hypot(5*SZ-cx,5*SZ-cz);if(e<700)it.push([e,azrieli])}{const e=Math.hypot(SZ-cx,10*SZ-cz);if(e<500)it.push([e,clockTower])}
+ // night street glow at intersections
+ if(nf<.6)it.push([8.9e4,()=>{for(let i=0;i<=N;i++)for(let j=0;j<=N;j++){const x=(i-.5)*SZ,z=(j-.5)*SZ;if(Math.abs(x-cx)<110&&Math.abs(z-cz)<110)glow(x,z,14,'rgba(255,200,120,'+(.6-nf)*.6+')')}}])};
+const _po11=post;post=function(){_po11();if(!S.fog)return;g.fillStyle=cx>5.5*SZ?'rgba(255,170,80,.07)':'rgba(255,190,120,.045)';g.fillRect(0,0,W,H)};
+// ---- procedural music: plays when the MP3 songs are missing
+const SY={ac:null,m:null,cur:'',vol:0,st:0,nx:0,nz:null,seq:{}};
+const SYT={MenuSong:{bpm:92,root:50,sc:[0,1,4,5,7,8,10],kick:'x...x...x..x....',sn:'....x.......x...',hat:'..x...x...x...x.',lead:'tri'},
+ Music1:{bpm:116,root:53,sc:[0,2,4,5,7,9,11],kick:'x...x...x...x...',sn:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',lead:'sq'},
+ Music2:{bpm:104,root:52,sc:[0,1,4,5,7,8,10],kick:'x..x..x.x.......',sn:'..x...x...x.x.x.',hat:'xx.xx.xx.xx.x.x.',lead:'saw'},
+ Music3:{bpm:84,root:48,sc:[0,2,3,5,7,9,10],kick:'x.....x...x.....',sn:'....x.......x..x',hat:'x..x..x..x..x..x',lead:'tri'},
+ Music4:{bpm:124,root:45,sc:[0,2,3,5,7,8,10],kick:'x...x...x...x...',sn:'....x.......x...',hat:'..x...x...x...x.',lead:'sq'}};
+function synthInit(){if(SY.ac)return 1;try{SY.ac=new(window.AudioContext||window.webkitAudioContext)();SY.m=SY.ac.createGain();SY.m.gain.value=0;SY.m.connect(SY.ac.destination);const b=SY.ac.createBuffer(1,SY.ac.sampleRate*.5,SY.ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=R()*2-1;SY.nz=b;setInterval(synthTick,25);return 1}catch(e){return 0}}
+function tone(t,f,dur,type,v,dest){const o=SY.ac.createOscillator(),gn=SY.ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t);gn.gain.setValueAtTime(v,t);gn.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(gn);gn.connect(dest||SY.m);o.start(t);o.stop(t+dur+.02);return o}
+function noise(t,dur,v,hp){const s=SY.ac.createBufferSource(),f=SY.ac.createBiquadFilter(),gn=SY.ac.createGain();s.buffer=SY.nz;f.type='highpass';f.frequency.value=hp;gn.gain.setValueAtTime(v,t);gn.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f);f.connect(gn);gn.connect(SY.m);s.start(t);s.stop(t+dur+.02)}
+const mf=n=>440*Math.pow(2,(n-69)/12);
+function synthTick(){const a=SY.ac;if(!a||!SY.cur||a.state!='running')return;const T=SYT[SY.cur];if(!T)return;const sp=60/T.bpm/4;if(SY.nx<a.currentTime)SY.nx=a.currentTime+.05;
+ if(!SY.seq[SY.cur]){const r=srand(SY.cur.length*97+T.bpm),L=[];let d=0;for(let i=0;i<64;i++){d=cl(d+[-2,-1,0,1,1,2][r()*6|0],-3,9);L.push(r()<.55?d:null)}SY.seq[SY.cur]={L,B:[0,0,4,0,3,3,5,4].map(x=>x)}}const Q=SY.seq[SY.cur];
+ while(SY.nx<a.currentTime+.12){const t=SY.nx,s=SY.st%16,bar=(SY.st>>4)%8,note=k=>T.root+12*Math.floor(k/7)+T.sc[((k%7)+7)%7];
+  if(T.kick[s]=='x'){const o=tone(t,140,.35,'sine',.9);o.frequency.exponentialRampToValueAtTime(42,t+.25)}
+  if(T.sn[s]=='x')noise(t,.16,.35,1400);if(T.hat[s]=='x')noise(t,.04,.12,7000);
+  if(s%4==0||s%4==3&&R()<.3)tone(t,mf(note(Q.B[bar])-12),sp*1.8,'triangle',.35);
+  if(s%2==0){const k=Q.L[(SY.st>>1)%64];if(k!=null)tone(t,mf(note(k)+12),sp*1.7,T.lead=='sq'?'square':T.lead=='saw'?'sawtooth':'triangle',.07)}
+  if(s==0&&bar%2==0)[0,2,4].forEach(k=>tone(t,mf(note(Q.B[bar]+k)),sp*14,'sine',.05));
+  SY.nx+=sp;SY.st++}}
+function synthPlay(n,v){if(!n&&!SY.ac)return;if(!synthInit())return;if(n!=SY.cur){SY.cur=n;SY.st=0}SY.vol=n?v:0;SY.m.gain.setTargetAtTime(SY.vol*.32,SY.ac.currentTime,.15)}
+['pointerdown','keydown'].forEach(e=>addEventListener(e,()=>{if(SY.ac&&SY.ac.state=='suspended')SY.ac.resume()}));
+const sBad=n=>n&&AU[n]&&(AU[n].error||AU[n].networkState==3);
+const _play11=play;play=function(n,v){if(sBad(n)){if(cur&&cur!=n&&AU[cur]&&!AU[cur].paused)AU[cur].pause();cur=n;synthPlay(n,v==null?.7:v)}else{synthPlay('',0);_play11(n,v)}};
+TR.forEach(n=>AU[n].addEventListener('error',()=>{if(cur==n){cur='';play(n)}}));
+// ---- cars: cheap traffic looks cheap, expensive cars look expensive
+const ACC=[13,21,10,19,6,32,20,21,18,28],GRIP=[6.5,9,5.5,8.5,12,11,8,6.5,8,10.5],TIER=[0,2,0,1,1,4,1,2,3,4];
+const _rc11=rcar;rcar=function(){const c=_rc11();if(c.ty==1&&R()<.7)c.ty=0;if(R()<.12)c.ty=2;c.c=pick(['#8c8f94','#6e6a60','#9a8f7a','#5a6470','#a4a4a4','#7a5c4a','#c9c4b8','#4a5a4a','#b0a080']);c.rs=R()<.7;return c};
+const _dc11=drawCar;drawCar=function(o){const ty=o.ty,tr=TIER[ty]||0,dd=Math.hypot(o.x-cx,o.z-cz),a=o.a,fx=sin(a),fz=cos(a),rx=cos(a),rz=-sin(a),s=CT[ty][3],now=performance.now();
+ if(tr>=3&&o.hp>0&&S.fx){const p=pj(o.x,.05,o.z);if(p[2]>1){const cc=ty==5?'255,215,0':ty==9?'0,230,255':'170,120,255',k=F/p[2],gr=g.createRadialGradient(p[0],p[1],0,p[0],p[1],3.4*s*k);gr.addColorStop(0,'rgba('+cc+','+(nf<.7?.55:.3)+')');gr.addColorStop(1,'rgba('+cc+',0)');g.fillStyle=gr;g.beginPath();g.ellipse(p[0],p[1],3.4*s*k,1.3*s*k,0,0,7);g.fill()}}
+ _dc11(o);if(dd>70||o.hp<=0)return;const at=(u,v)=>[o.x+(rx*u+fx*v)*s,o.z+(rz*u+fz*v)*s],side=(cx-o.x)*rx+(cz-o.z)*rz>0?1:-1;
+ if(tr==0&&ty!=6&&ty!=4&&(o.bot||o.rs)){[[1.02,.9,'#7a4a2a'],[-1.02,-1,'#8a5a32'],[1.02,-1.4,'#6a3a20']].forEach(([u,v,c],i)=>{if((i<2||o.rs)&&Math.sign(u)==side){const p=at(u,v);obox(p[0],p[1],.03*s,.35*s,.45,.75,a,c)}});if(o.rs&&side<0){const p=at(-1.01,.4);obox(p[0],p[1],.03*s,.5*s,.4,.95,a,'#b8b8b0')}}
+ if(tr>=2){const L=ty==8?2.6:2.2,v=((now/1600)%1*2-1)*L,p=at(0,v);obox(p[0],p[1],.75*s,.06*s,ty==8?1.72:ty==7?1.6:1.3,ty==8?1.75:ty==7?1.62:1.33,a,'rgba(255,255,255,.85)');[side].forEach(u=>{const q=at(u*(ty==9||ty==5?1.14:ty==7?1.09:1.03),0);obox(q[0],q[1],.03*s,1.6*s,.62,.68,a,'#f0f0f0')})}
+ if(tr>=3&&o==P.car&&Math.abs(o.v)>CT[ty][2]*.7&&R()<.5){const p=at(0,-2.5);fxp(p[0],.5,p[1],1,ty==5?'#ffd700':'#66ccff')}
+ if(tr>=3&&!o.bot&&Math.abs(o.v||0)<1&&R()<.04){const p=at(rnd(-1,1),rnd(-2,2));fxp(p[0],1.3,p[1],1,'#ffffff')}};
+// ---- new driving model: real grip, handbrake slides, drift combos
+function carx(dt){const c=P.car;if(!c)return;
+ if(c.ty==6){c.y=cl((c.y||0)+((K.Space?1:0)-(K.KeyC?1:0))*14*dt,0,60);P.y=c.y}
+ else{if(Z.cs){c.a=Z.cs.a;c.v=Z.cs.v;c.hp=Z.cs.hp}const T=CT[c.ty],top=T[2]*S.spd,acc=(ACC[c.ty]||20)*S.spd,grip=GRIP[c.ty]||8,mv=c.hp>0?(up()?1:0)-(dn()?1:0):0,tn=(rt()?1:0)-(lf()?1:0),hb=!!K.Space,dr=!!(K.ShiftLeft||K.ShiftRight);
+  if(c.vx==null||Z.x0==null){c.vx=sin(c.a)*c.v;c.vz=cos(c.a)*c.v}const x0=Z.x0==null?c.x:Z.x0,z0=Z.z0==null?c.z:Z.z0;
+  let fx=sin(c.a),fz=cos(c.a),vf=c.vx*fx+c.vz*fz;const spd=Math.hypot(c.vx,c.vz);
+  const st=tn*(hb?2.2:dr?2.1:1.9)*cl(vf/9,-1,1)*(1-Math.min(.45,Math.abs(vf)/top*.45));c.a+=st*dt;
+  fx=sin(c.a);fz=cos(c.a);const rx=cos(c.a),rz=-sin(c.a);vf=c.vx*fx+c.vz*fz;let vl=c.vx*rx+c.vz*rz;
+  if(mv>0)vf+=acc*dt*(vf<0?2.2:Math.max(.15,1-(vf/top)**2));else if(mv<0)vf-=(vf>.5?acc*1.6:acc*.6)*dt;else vf-=Math.sign(vf)*Math.min(Math.abs(vf),3.5*dt);
+  if(hb)vf-=Math.sign(vf)*Math.min(Math.abs(vf),7*dt);vf=cl(vf,-12,top);
+  if((hb||dr)&&Math.abs(vf)>8&&tn)vl-=tn*Math.abs(vf)*(hb?.5:.35)*dt;
+  const gp=hb?1.1:dr?2.1:grip,keep=Math.exp(-gp*dt);if(hb||dr)vf+=Math.sign(vf)*Math.abs(vl)*(1-keep)*.4;vl*=keep;
+  {const sp2=Math.hypot(vf,vl),mx=top*1.05;if(sp2>mx){vf*=mx/sp2;vl*=mx/sp2}}c.vx=fx*vf+rx*vl;c.vz=fz*vf+rz*vl;c.x=x0+c.vx*dt;c.z=z0+c.vz*dt;
+  if(col(c,2.2*T[3],0)){const s=Math.hypot(c.vx,c.vz);if(s>9)c.hp-=s*.4;sk+=s*.08;c.vx*=-.3;c.vz*=-.3;if(Z.dp>50){say('Drift crashed! Points lost');Z.dp=0;Z.dmu=1}}
+  c.x=cl(c.x,LO,HI);c.z=cl(c.z,LO,HI);c.v=c.vx*fx+c.vz*fz;
+  const slip=Math.atan2(Math.abs(vl),Math.max(1,Math.abs(vf)));
+  if(spd>9&&slip>.2){Z.dg2=0;Z.dt2=(Z.dt2||0)+dt;Z.dmu=Math.min(5,1+(Z.dt2/2.2|0));Z.dp=(Z.dp||0)+spd*slip*dt*4*Z.dmu;sk=Math.max(sk,.5);if(S.fx&&R()<.8)fxp(c.x-fx*1.8,.3,c.z-fz*1.8,2,'#d8d8d8');SKM.push({x:c.x-fx*1.6,z:c.z-fz*1.6,a:c.a});if(SKM.length>300)SKM.shift()}
+  else if(Z.dp>0){Z.dg2=(Z.dg2||0)+dt;if(Z.dg2>.8){const r=Math.round(Z.dp);if(r>=20){P.cash+=r;gain(r/6|0);say('DRIFT BANKED +$'+r+' (x'+Z.dmu+')');chal('drift',r);Z.st.db=Math.max(Z.st.db||0,r)}Z.dp=0;Z.dt2=0;Z.dmu=1}}
+  if(hb&&spd>6)SKM.push({x:c.x-fx*1.6,z:c.z-fz*1.6,a:c.a});
+  Z.km=(Z.km||0)+spd*dt/1000;chal('drive',spd*dt/1000);
+  P.x=c.x;P.z=c.z;P.a=c.a}
+ if(!(c.y>2))cars.forEach(o=>{if(o!=c&&o.bot&&o.hp>0&&dist(o,c)<3.4&&Math.abs(c.v)>2){const k=-.4;c.vx=(c.vx||0)*k;c.vz=(c.vz||0)*k;c.v*=k;c.hp-=3;o.hp-=8;sk+=2;if(Z.dp>50){Z.dp=0;Z.dmu=1;say('Drift crashed!')}else say('Collision!')}})}
+// ---- one continuing story: Act I (Tel Aviv) -> Act II (Negev County) -> Act III (the base and the Uprising)
+ST.push(
+[6,'The Negev Connection',['Remember the bakery war and the sold-out Shabbat market? Somebody has been buying up Tel Aviv and trucking it east.','Army trucks with no plates, heading into Negev County. Find the Caravan Jobs office out there, then steal one of their trucks.'],[['jobN','Drive east to Caravan Jobs in Negev County'],['carN','Steal the gold army truck and scrap it at any Chop Shop']],12000,'am'],
+[7,'Sandstorm Run',['The truck logbook names a secret route through the desert. Only the Negev street racers know it.','Beat them in their own race and they will talk. Bring a fast car.'],[['race','Win the Negev desert race (first across every checkpoint)']],14000,'pot'],
+[10,"Hasson's Ledger",['The racers say all that money flows through the County Bank, into an account owned by General Caleb Hasson.','Crack the vault, grab his ledger and bring it to the Park Cafe in Yarkon Park.'],[['robN','Rob the County Bank in Negev County (talk to the clerk inside)'],['goP','Bring the ledger to the Park Cafe in Yarkon Park']],16000,'hk'],
+[11,'Yarkon Park Stand-off',['Hasson knows we have it. His soldiers are moving on the park to take the ledger back.','Hold the park until Weazel News gets the story out!'],[['defend','Defend Yarkon Park from Hasson\'s men']],18000,'arm'],
+[9,'Colonel in the Dunes',['The story is out, but Colonel Dror, Hasson\'s right hand, is moving the stolen food to the Military Base.','Take him and his escort out in Negev County. After that, only Big Yahu\'s plan is left.'],[['boss','Eliminate Colonel Dror and his escort in Negev County']],22000,'rk']);
+ST[6][2]=['Hasson\'s ledger proves it: the generals locked the Golden Falafel recipe and half the city\'s food inside the Military Base.','Raid it and Tel Aviv is yours.'];
+const ORDER=[0,1,2,3,4,5,8,9,10,11,12,6,7],ACT=p=>p<6?'ACT I · WHITE CITY HUSTLE':p<11?'ACT II · THE NEGEV CONNECTION':'ACT III · THE GOLDEN FALAFEL',sPos=m=>ORDER.indexOf(m),nextStory=()=>ORDER.find(m=>!Z.ch[m]);
+{const o=NEWS.slice();NEWS.length=0;NEWS.push(...o.slice(0,6),'RADIO: Unmarked army trucks spotted crossing into Negev County.','RADIO: Desert racers tear up Route 90. The camels are unimpressed.','RADIO: County Bank robbed! A ledger with General Hasson\'s name on it is missing.','RADIO: WEAZEL NEWS EXCLUSIVE: General Hasson hoarded the city\'s food!','RADIO: Colonel Dror is down. The generals are cornered.',o[6],o[7])}
+const RACES=[{n:'Negev Desert Loop',cps:[[7,1],[11,1],[11,6],[9,6],[9,10],[7,10],[7,2]],fee:500,r:4500,rv:25},{n:'Coastal Sprint',cps:[[0,1],[0,4],[0,8],[0,11],[3,11],[3,9]],fee:400,r:3200,rv:23},{n:'Downtown Dash',cps:[[4,3],[6,3],[6,8],[4,8],[4,4]],fee:600,r:3800,rv:24}];
+function raceTask(k,story){const R0=RACES[k],cps=R0.cps.map(([i,j])=>ip(i,j));let L=0;for(let i=1;i<cps.length;i++)L+=dist(cps[i],cps[i-1]);return{t:'race',k,cps,ci:0,st:0,tl:L/21+14,rv:R0.rv+(story?0:Z.lv*.25),r:story?150:R0.r,dst:cps[0],txt:'RACE: '+R0.n+' · drive to the start line (yellow beam)',rivals:[]}}
+const _ms11=ms;ms=function(m,i){const s=ST[m][3][i],last=i==ST[m][3].length-1,p=sPos(m),T={t:s[0],txt:s[1],r:last?ST[m][4]:150+40*p,m,nx:last?null:()=>ms(m,i+1)},NB=k=>pick(bl.filter(b=>b.k==k&&b.x0>5.5*SZ));
+ if(s[0]=='jobN'){T.t='go';T.dst=door(NB('job'))}
+ else if(s[0]=='goP'){T.t='go';T.dst=door(bl.find(b=>b.id==200))}
+ else if(s[0]=='robN'){T.t='rob';T.b=NB('bank');T.dst=door(T.b)}
+ else if(s[0]=='carN'){const q=spawnN(),c=mkcar(q.x,q.z,2);c.c='#ffd700';c.hp=200;cars.push(c);T.t='car';T.tg=c;T.dst=door(pick(bl.filter(b=>b.k=='chop')))}
+ else if(s[0]=='race')return Object.assign(raceTask(0,1),{txt:s[1],r:T.r,m,nx:T.nx});
+ else if(s[0]=='defend')Object.assign(T,{dst:{x:3*SZ-22,z:7*SZ},dur:60,el:0,sp:2});
+ else if(s[0]=='boss'){const q=spawnN(),n=mkn(q.x,q.z);Object.assign(n,{n:'TARGET',hp:750,arm:1,dmg:20,cl:'#4b5320',sc:1.2});npcs.push(n);for(let k=0;k<4;k++){const e=mkn(q.x+rnd(-5,5),q.z+rnd(-5,5));Object.assign(e,{hm:1,esc:n,arm:1,hp:170,dmg:12,cl:'#4b5320',mn:0});npcs.push(e)}T.t='hit';T.tg=n;T.dst=q}
+ else{const X=_ms11(m,i);if(X.t=='hit'&&X.tg){X.tg.hp=150+p*35;X.tg.dmg=14+p*2;for(let k=0;k<Math.min(4,p/2|0);k++){const e=mkn(X.tg.x+rnd(-4,4),X.tg.z+rnd(-4,4));Object.assign(e,{hm:1,esc:X.tg,arm:1,hp:100+p*10,dmg:8+p,cl:'#333333',mn:0});npcs.push(e)}}return X}
+ return T};
+offer=function(c){if(task)return say('Finish your current job first');if(c[3])return say('Cameron nods silently. Do not shoot him.');const i=CR.indexOf(c),m=nextStory();
+ if(m!=null&&ST[m][0]==i){const p=sPos(m);return dlg(c,['<b>'+ACT(p)+' · Mission '+(p+1)+'/'+ORDER.length+': '+ST[m][1]+'</b>'].concat(ST[m][2]),()=>{task=ms(m,0);splash(ACT(p),ST[m][1],'#ffffff',4);say(task.txt)})}
+ if(m!=null&&R()<.35)say(nm(c[0])+': Next story mission is with '+nm(CR[ST[m][0]][0])+'. Here, take some side work.');
+ if(R()<.3){const b=pick(bl.filter(b=>b.k!='base'));task={t:'go',dst:door(b),r:700+Z.lv*60,tl:Math.max(45,75-Z.lv),bt:'Courier run: reach '+b.n,txt:''};return say(nm(c[0])+': Get to '+b.n+' fast!')}
+ _offer(c);if(task&&task.m==null){task.r=Math.round(task.r*(1+(Z.lv-1)*.1));if(task.t=='hit'&&task.tg){task.tg.hp=150+Z.lv*12;task.tg.dmg=14+Z.lv}}};
+// ---- police career
+const PRK=[['Cadet',0,60,1],['Officer',3,100,1.2],['Sergeant',8,160,1.4],['Detective',15,240,1.7],['Lieutenant',25,350,2],['Captain',40,500,2.5]],prk=()=>{let k=0;PRK.forEach((r,i)=>{if((Z.rk|0)>=r[1])k=i});return k};
+function joinCop(){if(stars()>0||CH.on)return say('You cannot join while you are wanted.');Z.cop=1;own[2]=1;own.am=(own.am|0)+30;P.cl='#1d3a8a';const c=mkcar(P.x+7,P.z,3,P.a);c.own=1;(Z.in?Z.wcar:cars).push(c);Z.cd=15;splash('WELCOME TO THE FORCE','Rank: '+PRK[prk()][0]+' · משטרת ישראל','#8fb4ff',3.5)}
+joinPolice=function(){joinCop();phone()};
+function quitCop(){Z.cop=0;P.cl='#1e73be';say('You handed in your badge.');closeM()}
+function hqMenu(){paused=1;M.className='';M.style.cssText='';const k=prk(),nx=PRK[k+1];let h='<h2>🚓 Police HQ · משטרת ישראל</h2><p>Desk Sergeant: '+(Z.cop?'Back on shift, '+PRK[k][0]+'?':'Clean record? We are always hiring.')+'</p>';
+ if(!Z.cop)h+=stars()>0?'<p>You have '+stars()+' wanted stars. Lose them before you apply.</p>':'<button onclick="joinCop();hqMenu()">Join the Tel Aviv Police</button>';
+ else h+='<p>Rank <b>'+PRK[k][0]+'</b> · calls answered '+(Z.rk|0)+(nx?' · '+nx[0]+' at '+nx[1]+' calls':' · top rank')+' · salary $'+PRK[k][2]+'/min on duty · call pay x'+PRK[k][3]+'</p><button onclick="hqCar()">Requisition a patrol cruiser</button><button onclick="if(pay(150))P.hp=150;hqMenu()">Body armor $150</button><button onclick="if(pay(100))own.am=(own.am|0)+60;hqMenu()">Ammo x60 $100</button><button onclick="Z.cd=0;closeM();say(\'Dispatch will call you as soon as you step outside.\')">Request a call</button><button onclick="quitCop()">Hand in your badge</button>';
+ M.innerHTML=h+'<button onclick="closeM()">Leave</button>'}
+function hqCar(){const c=mkcar(P.x+7,P.z,PRK[prk()][0]=='Captain'?9:3,P.a);c.own=1;if(prk()>=5)c.c='#1d3a8a';(Z.in?Z.wcar:cars).push(c);say('Cruiser parked outside');closeM()}
+const _sh11=shop;shop=function(b){if(b.k=='pd')return hqMenu();_sh11(b)};
+dispatch=function(){if(task||stars()>0||Z.in)return;const k=prk(),pm2=PRK[k][3];
+ if(R()<.45){const b=pick(bl.filter(b=>b.k!='base'&&b.k!='pd'&&b.id!=200));task={t:'bust',b,dst:door(b),r:Math.round((700+Z.rk*50)*pm2),cp:1,txt:'DISPATCH: Armed suspect hiding inside '+b.n+'. Go in and make the arrest.'};say('DISPATCH: Suspect hiding inside '+b.n+'!')}
+ else{const p=spawnPos(),n=mkn(p.x,p.z);Object.assign(n,{n:'SUSPECT',hp:90+k*25,arm:R()<.4+k*.1,dmg:10+k*2,crim:1,mn:0,cl:'#553322'});npcs.push(n);task={t:'hit',tg:n,dst:p,r:Math.round((600+Z.rk*50)*pm2),cp:1,txt:'DISPATCH: Suspect fleeing (weaken, then E to arrest, or neutralize)'};say('DISPATCH: Suspect spotted, see the marker!')}};
+const _eb11=enterB;enterB=function(b){_eb11(b);if(!Z.in)return;if(task&&task.t=='bust'&&task.b==b){const n=mkn(rnd(-8,8),10);Object.assign(n,{n:'SUSPECT',crim:1,arm:1,hp:90+prk()*25,dmg:9+prk()*2,cl:'#553322',mn:0,a:PI});cops.push(n);Object.assign(task,{t:'hit',tg:n,ib:1,txt:'Arrest the suspect: weaken them, then press E (or neutralize)'});say('Police! Hands where I can see them!')}
+ else if(stars()>0&&CH.on){Z.cw=1.2;say('The police are right behind you!')}};
+const _lv11=leave;leave=function(){if(!Z.in)return;const xn=npcs,xc=cars;cops=cops.filter(n=>!n.crim);if(task&&task.ib&&task.tg&&!task.tg.dead){Object.assign(task,{t:'bust',tg:null,ib:0,txt:'DISPATCH: The suspect is still inside '+task.b.n})}_lv11();npcs=npcs.concat(xn);cars=cars.concat(xc)};
+const _iu11=inUpd;inUpd=function(dt){_iu11(dt);if(Z.cop&&task&&task.tg&&task.ib&&!task.tg.dead&&dist(task.tg,P)<3.2)hint=task.tg.hp<35?'[E] Arrest the suspect':'Weaken the suspect to arrest them'};
+const _a11=act;act=function(){if(Z.in&&Z.cop&&task&&task.cp&&task.tg&&!task.tg.dead&&dist(task.tg,P)<3.2&&task.tg.hp<35){task.tg.dead=1;task.r=Math.round(task.r*1.6);say('ARRESTED! Bonus pay.');return win()}_a11()};
+const _hn11b=hitN;hitN=function(n,d){const w=n.dead;NC=(n.hm||n.esc||(Z.cop&&(n.crim||n.sh)))?1:0;_hn11b(n,d);NC=0;if(!w&&n.dead&&n.sh&&Z.jn)chal('kills',1)};
+// ---- garage collection + mechanic
+const GAR=[[0,'Sedan'],[2,'Van'],[1,'Sports'],[7,'Muscle'],[8,'Luxury'],[9,'Supercar'],[5,'Hypercar'],[4,'Street Tank']];
+const addG=(f,ty)=>function(){const c0=P.cash;f.apply(this,arguments);if(P.cash<c0){Z.gar[typeof ty=='function'?ty(arguments):ty]=1;say('Added to your garage. Call the mechanic from your phone anytime.')}};
+buyC=addG(buyC,a=>a[0]);bh=addG(bh,a=>a[0]);bh2=addG(bh2,a=>a[0]);
+function mech(){paused=1;M.className='';M.style.cssText='';const L=GAR.filter(g=>Z.gar[g[0]]);M.innerHTML='<h2>🔧 Mechanic</h2><p>Your garage: '+L.length+'/'+GAR.length+' cars collected. Delivery $250.</p>'+(L.length?L.map(g=>`<button onclick="mechGo(${g[0]})">${g[1]}</button>`).join(''):'<p>Buy cars at a Garage to collect them.</p>')+'<button onclick="phone()">Back</button>'}
+function mechGo(ty){if(Z.in){say('Step outside first');return closeM()}if(pay(250)){const c=mkcar(P.x+sin(P.a)*8,P.z+cos(P.a)*8,ty,P.a);c.own=1;cars.push(c);say('Your '+CT[ty][0]+' has been delivered.')}closeM()}
+// ---- races (phone)
+function raceM(){paused=1;M.className='';M.style.cssText='';M.innerHTML='<h2>🏁 Street Races</h2><p>Beat the rival drivers to every checkpoint before time runs out. Best times are saved.</p>'+RACES.map((r,k)=>`<button onclick="raceGo(${k})">${r.n} · entry $${r.fee} · win $${r.r}${Z.rb[k]?' · best '+Z.rb[k].toFixed(1)+'s':''}</button>`).join('')+'<button onclick="phone()">Back</button>'}
+function raceGo(k){closeM();if(task)return say('Finish your current job first');if(pay(RACES[k].fee)){task=raceTask(k);say('Race booked: '+RACES[k].n+'. Get to the start line in a car!')}}
+// ---- collectibles: 10 Hamsas hidden in Negev County
+const HMP=(()=>{const r=srand(4242),L=[];while(L.length<10){const x=6*SZ+r()*5.5*SZ,z=r()*11*SZ;if(!inB(x,z,3))L.push({x,z})}return L})();
+// ---- daily challenges
+const CHP=[['drift','Bank $3,000 in drift money',3000],['jobs','Complete 3 jobs, calls or missions',3],['kills','Get 6 kills in street shootouts',6],['race','Win a street race',1],['col','Find 2 Golden Falafels or Hamsas',2],['cop','Answer 2 police calls',2],['drive','Drive 5 km',5]];
+function ensureDaily(){const d=new Date().toDateString();if(Z.dy&&Z.dy.d==d)return;let h=0;for(const c of d)h=(h*31+c.charCodeAt(0))%1e6;const r=srand(h+1),ids=[];while(ids.length<3){const k=r()*CHP.length|0;if(ids.indexOf(k)<0)ids.push(k)}Z.dy={d,ids,p:[0,0,0],ok:[0,0,0]}}
+function chal(key,a){Z.st=Z.st||{};Z.st[key]=(Z.st[key]||0)+a;if(!Z.dy)return;Z.dy.ids.forEach((id,i)=>{const c=CHP[id];if(c[0]!=key||Z.dy.ok[i])return;Z.dy.p[i]+=a;if(Z.dy.p[i]>=c[2]){Z.dy.ok[i]=1;P.cash+=2500;gain(300);splash('DAILY CHALLENGE COMPLETE',c[1]+'  +$2,500','#7ad66a',3)}})}
+function completion(){const n=o=>Object.keys(o||{}).length;return Math.round(n(Z.ch)/ST.length*40+Math.min(1,Z.fal/12)*10+n(Z.hmg)/HMP.length*10+n(Z.gar)/GAR.length*10+n(Z.pr)/PR.length*10+prk()/(PRK.length-1)*10+Math.min(1,n(Z.rb)/RACES.length)*10)}
+const RANKS=['Tourist','Street Rat','Hustler','Shuk Soldier','Enforcer','Lieutenant','Underboss','Kingpin of Tel Aviv'],rankN=()=>RANKS[Math.min(RANKS.length-1,(Z.lv-1)/2|0)];
+function progM(){paused=1;M.className='';M.style.cssText='';const n=o=>Object.keys(o||{}).length,m=nextStory();ensureDaily();
+ M.innerHTML='<h2>Progress · '+completion()+'% complete</h2><p>Rank: <b>'+rankN()+'</b> (Lv '+Z.lv+') · Story '+n(Z.ch)+'/'+ST.length+(m!=null?' · Next: <b>'+ST[m][1]+'</b> with '+nm(CR[ST[m][0]][0]):' · STORY COMPLETE')+'</p><p>Golden Falafels '+Z.fal+'/12 · Hamsas '+n(Z.hmg)+'/'+HMP.length+' (Negev County) · Garage '+n(Z.gar)+'/'+GAR.length+' · Properties '+n(Z.pr)+'/'+PR.length+' · Police rank '+PRK[prk()][0]+' · Races won '+n(Z.rb)+'/'+RACES.length+' · Best drift $'+((Z.st&&Z.st.db)|0)+'</p><h2>Daily challenges</h2>'+Z.dy.ids.map((id,i)=>'<p>'+(Z.dy.ok[i]?'✔ ':'◻ ')+CHP[id][1]+' ('+Math.min(CHP[id][2],Z.dy.p[i]).toFixed(CHP[id][0]=='drive'?1:0)+'/'+CHP[id][2]+') · reward $2,500</p>').join('')+'<button onclick="pm()">Back</button>'}
+// ---- busted / wasted
+function busted(){const fine=Math.min(P.cash,Math.max(500,P.cash*.15|0));P.cash-=fine;for(let i=1;i<10;i++)delete own[i];own.am=0;own.rk=0;P.w=0;if(CH.on)endCh('');wanted=0;wt=0;cops=[];task=null;if(P.car){P.car=null}const hq=bl.find(b=>b.k=='pd');if(hq){const d=door(hq);P.x=d.x;P.z=d.z+3}P.hp=100;Z.bt=0;splash('BUSTED','Weapons confiscated · fine $'+fine.toLocaleString(),'#4a8cff',4)}
+const _rs11=respawn;respawn=function(){if(!S.hc)return _rs11();const n=o=>Object.keys(o||{}).length,lost='Level '+Z.lv+' ('+rankN()+') · $'+P.cash.toLocaleString()+' · '+n(Z.ch)+'/'+ST.length+' story missions · '+completion()+'% complete';_rs11();
+ let bs='';try{const b=JSON.parse(localStorage.gta6best);bs='Best run ever: level '+b.lv+', $'+b.cash.toLocaleString()+', '+b.ch+' story missions.'}catch(e){}
+ paused=1;M.className='';M.style.cssText='background:#000c';M.innerHTML='<h1 style="color:#d22;font-family:Anton,Impact;font-size:80px">WASTED</h1><h2>Permadeath: your progress was erased</h2><p>You lost: '+lost+'</p><p>'+bs+'</p><button onclick="closeM()">Start a new life</button><button onclick="on=0;mainM()">Main menu</button>'};
+// ---- splash text (mission passed, busted, titles)
+function splash(a,b,c,d){Z.spl={a,b,c:c||'#f0c040',t:d||3,T:d||3}}
+// ---- start / load
+const _go11=go;go=function(o){const d=Z.cont?ld():null;_go11(o);Object.assign(Z,{gar:{},hmg:{},st:{},rb:{},dy:null,dp:0,dmu:1,dt2:0,dg2:0,bt:0,sal:0,spl:null,km:0,cs:null});
+ if(d&&d.z){['rk','cop','gar','hmg','st','dy','rb'].forEach(k=>{if(d.z[k]!=null)Z[k]=d.z[k]});if(Z.cop)P.cl='#1d3a8a'}ensureDaily();const m=nextStory();if(m!=null&&!d)setTimeout(()=>{if(on&&!task)say('STORY: call '+nm(CR[ST[m][0]][0])+' on your phone (P) to start "'+ST[m][1]+'"')},4500)};
+window.zx=()=>({rk:Z.rk|0,cop:Z.cop|0,gar:Z.gar||{},hmg:Z.hmg||{},st:Z.st||{},dy:Z.dy||null,rb:Z.rb||{}});
+// ---- win: GTA style "mission passed"
+const _w11=win;win=function(){const T=task;if(!T)return _w11();const k0=prk(),fin=!T.nx,st=T.m!=null,rw=Math.round(T.r*DF[S.dif][3]);_w11();
+ if(fin){chal('jobs',1);if(T.cp)chal('cop',1);splash(st?'MISSION PASSED':T.cp?'CALL COMPLETED':'JOB COMPLETE','+$'+rw.toLocaleString()+(st?'  ·  RESPECT +':''),st?'#f0c040':'#7ad66a',st?4:2.5);
+  if(st&&nextStory()==null)setTimeout(()=>splash('TEL AVIV IS FREE','Story complete! Keep grinding: races, police ranks, collectibles.','#ffffff',6),4200)}
+ else splash('','Objective complete','#ffffff',1.5);
+ const k1=prk();if(Z.cop&&k1>k0){const gift=[null,()=>{own[3]=1},()=>{own[4]=1},()=>{own[5]=1},()=>{P.cash+=10000},()=>{P.cash+=25000}][k1];if(gift)gift();setTimeout(()=>splash('PROMOTED',PRK[k1][0]+' · new gear and better pay','#8fb4ff',3.5),2600)}};
+// ---- update
+const _u11=upd;upd=function(dt){const c=P.car;Z.cs=!Z.in&&c&&c.ty!=6?{a:c.a,v:c.v,hp:c.hp}:null;const f0=Z.fal;_u11(dt);Z.cs=null;if(Z.fal>f0)chal('col',1);if(Z.in||dead>0)return;
+ CAMELS.forEach(m=>{const d=Math.hypot(m.x-P.x,m.z-P.z);if(d>200)return;m.t-=dt;if(m.t<=0){m.t=rnd(3,8);m.a=Math.round(rnd(0,4))*PI/2;m.w=R()<.6}if(m.w){const ox=m.x,oz=m.z;m.x=cl(m.x+sin(m.a)*1.4*dt,6*SZ,HI);m.z=cl(m.z+cos(m.a)*1.4*dt,LO,HI);m.ph+=dt*4;if(col(m,1.2,0))m.t=0}
+  if(P.car&&!(P.car.y>2)&&d<3&&Math.abs(P.car.v)>5){P.car.v*=.4;P.car.vx*=.4;P.car.vz*=.4;sk+=3;m.a+=PI;say('You hit a camel! It is fine. Mostly.')}});
+ HMP.forEach((h,i)=>{if(!Z.hmg[i]&&dist(h,P)<3){Z.hmg[i]=1;P.cash+=1000;gain(150);chal('col',1);const n=Object.keys(Z.hmg).length;if(n==HMP.length){P.cash+=25000;splash('ALL 10 HAMSAS FOUND','+$25,000 · the desert blesses you','#4aa3ff',4)}else say('Hamsa found! +$1,000 ('+n+'/'+HMP.length+')')}});
+ npcs.forEach(n=>{if(n.esc){if(n.esc.dead&&!n.mad){n.esc=null;n.fl=5}else if(n.esc&&!n.mad){if(dist(P,n)<28||n.esc.mad)n.mad=1;else if(dist(n,n.esc)>5){const a=Math.atan2(n.esc.x-n.x,n.esc.z-n.z);n.x+=sin(a)*3*dt;n.z+=cos(a)*3*dt}}}});
+ if(task&&task.t=='defend'){const T=task,inA=dist(P,T.dst)<40;if(inA)T.el+=dt;T.sp-=dt;const k=Z.lv;if(T.sp<=0){T.sp=6.5;for(let i=0;i<2+(k/3|0)&&npcs.filter(n=>n.hm&&!n.dead).length<9;i++){const a=rnd(0,6.28),x=T.dst.x+sin(a)*rnd(45,60),z=T.dst.z+cos(a)*rnd(45,60);if(inB(x,z,2))continue;const n=mkn(cl(x,LO,HI),cl(z,LO,HI));Object.assign(n,{hm:1,mad:1,arm:1,hp:110+k*10,dmg:8+k,cl:'#4b5320',mn:0});npcs.push(n)}}
+  T.txt='Hold Yarkon Park: '+Math.max(0,T.dur-T.el|0)+'s left'+(inA?'':' · GET BACK TO THE PARK CAFE!');if(T.el>=T.dur){npcs.forEach(n=>{if(n.hm){n.hm=0;n.mad=0;n.fl=8}});win()}}
+ if(task&&task.t=='race')raceUpd(dt);
+ if(!P.car&&!Z.cop&&stars()>=1&&stars()<=2){let near=0;cops.forEach(n=>{if(n.dead||n.army||n.sw)return;const d=dist(n,P);if(d<14&&d>1.3){const a=Math.atan2(P.x-n.x,P.z-n.z);n.x+=sin(a)*4.2*dt;n.z+=cos(a)*4.2*dt;col(n,.6,0)}if(d<1.9)near=1});Z.bt=near&&P.cd<=0?Z.bt+dt:Math.max(0,Z.bt-dt*.5);if(Z.bt>2.5)busted()}else Z.bt=0;
+ if(Z.cop){Z.sal+=dt;if(Z.sal>=60){Z.sal=0;const s=PRK[prk()][2];P.cash+=s;say('Police salary +$'+s)}}};
+function raceUpd(dt){const T=task,me=P.car;if(!T.st){if(dist(P,T.cps[0])<10){if(!me)return void(T.txt='RACE: you need a car!');T.st=1;T.ci=1;T.dst=T.cps[1];T.t0=0;
+  [-1,1].forEach(s=>{const c=mkcar(T.cps[0].x+s*4,T.cps[0].z,R()<.5?9:1,Math.atan2(T.cps[1].x-T.cps[0].x,T.cps[1].z-T.cps[0].z));Object.assign(c,{rc:1,ci:1,v:0,c:s<0?'#00c2ff':'#ff3b3b',sp:T.rv*(s<0?1:.94)});cars.push(c);T.rivals.push(c)});splash('3 · 2 · 1 · GO!',RACES[T.k].n,'#ffffff',1.6)}return}
+ T.t0+=dt;T.tl-=dt;let first=null;T.rivals.forEach(c=>{if(c.ci>=T.cps.length||c==P.car)return;const q=T.cps[c.ci],d=dist(c,q),ta=Math.atan2(q.x-c.x,q.z-c.z);let da=((ta-c.a+PI)%(2*PI)+2*PI)%(2*PI)-PI;c.a+=cl(da,-2.5*dt,2.5*dt);const tv=d<25&&c.ci<T.cps.length-1?c.sp*.55:c.sp;c.v+=(tv-c.v)*dt*.9;c.x+=sin(c.a)*c.v*dt;c.z+=cos(c.a)*c.v*dt;if(d<9){c.ci++;if(c.ci>=T.cps.length&&!T.lost)T.lost=1}});
+ if(me&&dist(P,T.dst)<10){T.ci++;if(T.ci>=T.cps.length){const k=T.k;T.rivals.forEach(c=>{cars=cars.filter(o=>o!=c)});if(T.lost){task=null;return splash('MISSION FAILED','A rival crossed the line first','#ff4040',3)}Z.rb[k]=Math.min(Z.rb[k]||1e9,T.t0);if(T.m==null)chal('race',1);return win()}T.dst=T.cps[T.ci]}
+ T.txt='RACE: checkpoint '+T.ci+'/'+(T.cps.length-1)+' · '+Math.max(0,T.tl|0)+'s'+(T.lost?' · A RIVAL FINISHED FIRST':'');if(T.tl<0){T.rivals.forEach(c=>{cars=cars.filter(o=>o!=c)});task=null;splash('MISSION FAILED','Out of time','#ff4040',3)}}
+// ---- extra world drawing: hamsas, race checkpoints
+const _xt11b=xtra;xtra=function(it,dc,RV){_xt11b(it,dc,RV);HMP.forEach((h,i)=>{if(Z.hmg&&Z.hmg[i])return;const e=dc(h);if(e<RV)it.push([e,()=>{const t=performance.now()/500;obox(h.x,h.z,.15,.6,1.2+sin(t)*.3,2.4+sin(t)*.3,t,'#1e6fd9');obox(h.x,h.z,.18,.2,1.7+sin(t)*.3,1.9+sin(t)*.3,t,'#ffffff')}])});
+ if(task&&task.t=='race'){const q=task.dst;it.push([dc(q)+1,()=>glow(q.x,q.z,10,'rgba(255,215,0,.6)')])}};
+const _mi11=mini;mini=function(){_mi11();const k=.32*mz,X=78,Y=H-148;HMP.forEach((h,i)=>{if(Z.hmg&&Z.hmg[i])return;const dx=h.x-P.x,dz=h.z-P.z,x=(dx*cos(P.a)-dz*sin(P.a))*k,y=-(dx*sin(P.a)+dz*cos(P.a))*k;if(x*x+y*y<3300){g.fillStyle='#4aa3ff';g.fillRect(X+x-2,Y+y-2,4,4)}})};
+// ---- HUD additions
+const _hu11=hud;hud=function(){_hu11();g.shadowBlur=0;
+ if(dead>0){g.save();g.globalCompositeOperation='saturation';g.fillStyle='hsl(0,0%,50%)';g.fillRect(0,0,W,H);g.restore();g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,H/2-70,W,110);g.textAlign='center';g.font='96px Anton,Impact';g.lineWidth=8;g.strokeStyle='#000';g.strokeText('WASTED',W/2,H/2+20);g.fillStyle='#c8102e';g.fillText('WASTED',W/2,H/2+20)}
+ g.textAlign='right';g.font='bold 13px Arial';g.fillStyle='#ffffffcc';g.fillText(rankN()+' · '+completion()+'% complete',W-20,122);
+ if(Z.cop){g.textAlign='left';g.fillStyle='#8fb4ff';g.fillText('Police rank: '+PRK[prk()][0],20,102)}
+ else if(!task){const m=nextStory();if(m!=null){g.textAlign='left';g.fillStyle='#ffd23f';g.fillText('STORY: talk to or call '+nm(CR[ST[m][0]][0])+' (P) for "'+ST[m][1]+'"',20,102)}}
+ if(P.car&&P.car.ty!=6){const v=Math.abs(P.car.v)*3.6|0;g.textAlign='right';g.font='44px Anton,Impact';g.lineWidth=5;g.strokeStyle='#000';g.strokeText(v,W-70,H-40);g.fillStyle='#fff';g.fillText(v,W-70,H-40);g.font='bold 14px Arial';g.fillText('km/h',W-22,H-42);g.fillStyle='#ffffffaa';g.fillText(CT[P.car.ty][0]+(TIER[P.car.ty]>=3?' ★':''),W-22,H-90)}
+ if(Z.dp>0){g.textAlign='center';g.font='40px Anton,Impact';g.lineWidth=5;g.strokeStyle='#000';const t='DRIFT  ₪'+Math.round(Z.dp)+'  x'+Z.dmu;g.strokeText(t,W/2,H*.2);g.fillStyle=Z.dmu>=4?'#ff7a18':'#ffd23f';g.fillText(t,W/2,H*.2)}
+ if(Z.bt>.3){g.textAlign='center';g.font='bold 20px Arial';g.fillStyle='#4a8cff';g.fillText('A cop is grabbing you! Fight back or run! ('+(2.5-Z.bt).toFixed(1)+'s)',W/2,H*.36)}};
+const _dr11=draw;draw=function(){if(P){msg=ILS(msg);hint=ILS(hint);if(task&&task.txt)task.txt=ILS(task.txt)}_dr11();const s=Z.spl;if(P&&on&&s){s.t-=1/60;if(s.t<=0){Z.spl=null;return}const al=Math.min(1,s.t*2,(s.T-s.t)*4);g.save();g.globalAlpha=al;g.textAlign='center';
+ if(s.a){g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,H*.3-60,W,s.b?110:80);g.font=Math.min(84,W/12)+'px Anton,Impact';g.lineWidth=7;g.strokeStyle='#000';g.strokeText(s.a,W/2,H*.3);g.fillStyle=s.c;g.fillText(s.a,W/2,H*.3)}
+ if(s.b){g.font='bold 22px Arial';g.lineWidth=4;g.strokeStyle='#000';const b=ILS(s.b);g.strokeText(b,W/2,H*.3+(s.a?36:0));g.fillStyle='#fff';g.fillText(b,W/2,H*.3+(s.a?36:0))}g.restore()}};
+// ---- menus
+const _ph11=phone;phone=function(){_ph11();const m=nextStory(),x=(m!=null?'<p>Next story mission: <b>'+ST[m][1]+'</b> · call <b>'+nm(CR[ST[m][0]][0])+'</b></p>':'<p>Story complete. Tel Aviv is free!</p>')+'<button onclick="raceM()">🏁 Street races</button><button onclick="mech()">🔧 Mechanic (your garage)</button><button onclick="progM()">📋 Progress & daily challenges</button>';const i=M.innerHTML.lastIndexOf('<button onclick="closeM()">Close</button>');if(i>=0)M.innerHTML=M.innerHTML.slice(0,i)+x+M.innerHTML.slice(i)};
+const _pm11=pm;pm=function(){_pm11();M.innerHTML=M.innerHTML.replace('<button onclick="settings()">Settings</button>',()=>'<button onclick="progM()">Progress & challenges</button><button onclick="settings()">Settings</button>')};
+const _mm11=mainM;mainM=function(){_mm11();let bs='';try{const b=JSON.parse(localStorage.gta6best);bs='<p>Best run: level '+b.lv+', $'+b.cash.toLocaleString()+', '+b.ch+' story missions</p>'}catch(e){}M.innerHTML=M.innerHTML.replace('<h1>GTA 6: TEL AVIV</h1>',()=>'<h1 style="font-family:Anton,Impact;letter-spacing:2px">GTA 6: TEL AVIV</h1><h2 style="font-size:30px">תל אביב · NEGEV COUNTY</h2>'+bs)};
+const _in11=ins;ins=function(){_in11();M.innerHTML=M.innerHTML.replace('<button onclick="back()">Back</button>',()=>'<p><b>New:</b> The story runs in three acts (Tel Aviv, the Negev Connection, the Golden Falafel). The yellow STORY line and your phone tell you who to see next. Money is in shekels (₪). <b>Driving:</b> hold <b>Space</b> for the handbrake or <b>Shift</b> to drift; chain long slides for a x2 to x5 multiplier, but crashing loses the points. <b>Police:</b> with 0 stars, join at Police HQ (blue P on the map) or from your phone. Answer dispatch calls, arrest suspects (even inside buildings), get promoted from Cadet to Captain. At 1-2 stars, cops try to cuff you: let them hold you for 2.5s and you are BUSTED (weapons gone, fine). Cops also follow you into buildings. <b>Grind:</b> street races, a car garage to collect (mechanic delivers), 10 Hamsas hidden in Negev County, 3 daily challenges, police ranks and a completion %. Permadeath (on by default) erases everything when you die.</p><button onclick="back()">Back</button>')};
+mainM();
 
 </script></body></html>

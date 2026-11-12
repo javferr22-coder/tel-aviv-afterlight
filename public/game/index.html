@@ -839,8 +839,7 @@ function synthTick(){const a=SY.ac;if(!a||!SY.cur||a.state!='running')return;con
 function synthPlay(n,v){if(!n&&!SY.ac)return;if(!synthInit())return;if(n!=SY.cur){SY.cur=n;SY.st=0}SY.vol=n?v:0;SY.m.gain.setTargetAtTime(SY.vol*.32,SY.ac.currentTime,.15)}
 ['pointerdown','keydown'].forEach(e=>addEventListener(e,()=>{if(SY.ac&&SY.ac.state=='suspended')SY.ac.resume()}));
 const sBad=n=>n&&AU[n]&&(AU[n].error||AU[n].networkState==3);
-const _play11=play;play=function(n,v){if(sBad(n)){if(cur&&cur!=n&&AU[cur]&&!AU[cur].paused)AU[cur].pause();cur=n;synthPlay(n,v==null?.7:v)}else{synthPlay('',0);_play11(n,v)}};
-TR.forEach(n=>AU[n].addEventListener('error',()=>{if(cur==n){cur='';play(n)}}));
+/* synth music removed: game uses only the real MP3 files */
 // ---- cars: cheap traffic looks cheap, expensive cars look expensive
 const ACC=[13,21,10,19,6,32,20,21,18,28],GRIP=[6.5,9,5.5,8.5,12,11,8,6.5,8,10.5],TIER=[0,2,0,1,1,4,1,2,3,4];
 const _rc11=rcar;rcar=function(){const c=_rc11();if(c.ty==1&&R()<.7)c.ty=0;if(R()<.12)c.ty=2;c.c=pick(['#8c8f94','#6e6a60','#9a8f7a','#5a6470','#a4a4a4','#7a5c4a','#c9c4b8','#4a5a4a','#b0a080']);c.rs=R()<.7;return c};

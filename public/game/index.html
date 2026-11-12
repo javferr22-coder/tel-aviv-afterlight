@@ -1000,15 +1000,15 @@ mainM();
 const LM=()=>{const hq=bl.find(b=>b.k=='pd'),L=[];
  if(hq){const d=door(hq);L.push({x:d.x,z:d.z,c:'#3a6bff',t:'P',n:'POLICE HQ'})}
  if(Z.base)L.push({x:Z.base.x,z:Z.base.z,c:'#33ff66',t:'B',n:'MILITARY BASE'});
- L.push({x:5*SZ,z:5*SZ,c:'#cfe3f2',t:'A',n:'AZRIELI'},{x:SZ,z:10*SZ,c:'#e2c48a',t:'T',n:'CLOCK TOWER'},{x:(PK.i0+PK.i1)/2*SZ,z:(PK.j0+PK.j1)/2*SZ,c:'#4cc35a',t:'Y',n:'YARKON PARK'});
+ if(window.YBK)L.push({x:YBK.x,z:YBK.z,c:'#ff3b30',t:'☢',n:'BUNKER'});L.push({x:5*SZ,z:5*SZ,c:'#cfe3f2',t:'A',n:'AZRIELI'},{x:SZ,z:10*SZ,c:'#e2c48a',t:'T',n:'CLOCK TOWER'},{x:(PK.i0+PK.i1)/2*SZ,z:(PK.j0+PK.j1)/2*SZ,c:'#4cc35a',t:'Y',n:'YARKON PARK'});
  if(typeof task!='undefined'&&task&&typeof tgt=='function'){const t=tgt();if(t&&isFinite(t.x))L.push({x:t.x,z:t.z,c:'#ffd23f',t:'★',n:'TARGET',big:1})}
  return L};
 window.areaName=function(){if(Z.in)return 'Indoors';const i=P.x/SZ,j=P.z/SZ;if(i>=PK.i0-.5&&i<=PK.i1+.5&&j>=PK.j0-.5&&j<=PK.j1+.5)return 'Yarkon Park';
- let best='',bd=1e9;ZL.forEach(z=>{const d=Math.hypot(z[1]-i,z[2]-j);if(d<bd){bd=d;best=z[0]}});return best+(P.x>5.5*SZ?' · Negev County':' · Tel Aviv')};
+ let best='',bd=1e9;ZL.forEach(z=>{const d=Math.hypot(z[1]-i,z[2]-j);if(d<bd){bd=d;best=z[0]}});const r=P.x>5.5*SZ?'Negev County':'Tel Aviv';return /Negev|Tel Aviv/.test(best)?best:best+' · '+r};
 const badge=(x,y,c,t,r)=>{g.fillStyle='#000a';g.beginPath();g.arc(x,y,r+1.5,0,7);g.fill();g.fillStyle=c;g.beginPath();g.arc(x,y,r,0,7);g.fill();g.fillStyle='#000';g.font='bold '+(r*1.5|0)+'px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText(t,x,y+.5);g.textBaseline='alphabetic'};
 const _mi13=mini;mini=function(){_mi13();if(!P)return;const k=.32*mz,X=78,Y=H-148,R=64,rel=(x,z)=>{const dx=x-P.x,dz=z-P.z;return[(dx*cos(P.a)-dz*sin(P.a))*k,-(dx*sin(P.a)+dz*cos(P.a))*k]};
  if(!Z.in){g.save();g.beginPath();g.arc(X,Y,R,0,7);g.clip();
-  bl.forEach(b=>{if(b.k=='base'||b.k=='pd'||!KC[b.k])return;const d=door(b),p=rel(d.x,d.z);if(p[0]*p[0]+p[1]*p[1]>58*58)return;badge(X+p[0],Y+p[1],KC[b.k],KL[b.k],4.5)});g.restore();
+  bl.forEach(b=>{if(b.k=='base'||b.k=='pd'||b.k=='yb'||!KC[b.k])return;const d=door(b),p=rel(d.x,d.z);if(p[0]*p[0]+p[1]*p[1]>58*58)return;badge(X+p[0],Y+p[1],KC[b.k],KL[b.k],4.5)});g.restore();
   LM().forEach(o=>{let p=rel(o.x,o.z);const d=Math.hypot(p[0],p[1]);if(d>R-7){p=[p[0]*(R-7)/d,p[1]*(R-7)/d];badge(X+p[0],Y+p[1],o.c,o.t,o.big?6:5)}else{badge(X+p[0],Y+p[1],o.c,o.t,o.big?6.5:5.5);g.font='bold 8px Arial';g.textAlign='center';g.lineWidth=2.5;g.strokeStyle='#000';g.strokeText(o.n,X+p[0],Y+p[1]-9);g.fillStyle='#fff';g.fillText(o.n,X+p[0],Y+p[1]-9)}});}
  g.fillStyle='#000c';g.fillRect(0,Y+83,262,13);g.font='bold 10px Arial';g.textAlign='left';g.fillStyle='#fff';g.fillText('G gear C cars F food S spk X chop $ bank J jobs · N map',4,Y+93);
  const an=areaName();g.font='bold 12px Arial';const w=g.measureText(an).width+14;g.fillStyle='#000b';g.fillRect(X-w/2,Y-R-20,w,16);g.fillStyle='#ffe27a';g.textAlign='center';g.fillText(an,X,Y-R-8);
@@ -1016,6 +1016,45 @@ const _mi13=mini;mini=function(){_mi13();if(!P)return;const k=.32*mz,X=78,Y=H-14
 const _fm13=fullMap;fullMap=function(){_fm13();const w=Math.min(W,H)*.88,k=w/((N+.5)*SZ),X0=W/2-w/2,Y0=H/2-w/2,m=(x,z)=>[X0+(x+SZ/2)*k,Y0+w-(z+SZ/2)*k];
  LM().forEach(o=>{const p=m(o.x,o.z);badge(p[0],p[1],o.c,o.t,o.big?9:8);g.font='bold 12px Arial';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#000';g.strokeText(o.n,p[0],p[1]-13);g.fillStyle='#fff';g.fillText(o.n,p[0],p[1]-13)});
  g.font='bold 13px Arial';g.textAlign='center';g.fillStyle='#ffe27a';g.fillText('You are in: '+areaName()+'   ·   P Police HQ · B Military Base · A Azrieli · T Clock Tower · Y Yarkon Park · ★ current target',W/2,Y0-8)};
+})();
+</script>
+<script>/* v13 patch: Big Yahu's Bunker - optional nuke side activity (not part of the story) */
+(function(){
+const NR=420,COST=75000,PAY=100000,CD=600,FUSE=45;
+let YB=null;{let bd=1e9;bl.forEach(b=>{if(b.k=='base'||b.k=='pd'||b.x0<6.5*SZ)return;const d=Math.hypot((b.x0+b.x1)/2-9*SZ,(b.z0+b.z1)/2-1*SZ);if(d<bd){bd=d;YB=b}});}
+if(!YB)return;
+Object.assign(YB,{k:'yb',n:"Big Yahu's Bunker",c:'#4a4d42',h:7});KC.yb='#ff3b30';KL.yb='☢';
+const YX=(YB.x0+YB.x1)/2,YZ=(YB.z0+YB.z1)/2;window.YBK={x:YX,z:YZ};
+YB.dr=function(b){const hw=(b.x1-b.x0)/2,hl=(b.z1-b.z0)/2;
+ obox(YX,YZ,hw,hl,0,.3,0,'#8a7a5a');obox(YX,YZ,hw*.7,hl*.6,0,6,0,'#55584c',1);obox(YX,YZ,hw*.5,hl*.4,6,7.5,0,'#3e4038');
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([u,v])=>obox(YX+u*hw*.9,YZ+v*hl*.9,.6,.6,0,4,0,'#2d2d2d'));
+ obox(YX,b.z1-1,4,1.2,0,4.5,0,'#2a2a2a');obox(YX+hw*.4,YZ,.25,.25,7.5,22,0,'#9a9a9a');
+ if(Z.nt>0&&(performance.now()/250|0)%2)obox(YX+hw*.4,YZ,.8,.8,22,23.6,0,'#ff2020');
+ label(YX,12,YZ,"BIG YAHU'S BUNKER",2.4,'#ff5a4a');label(YX,9.5,YZ,'☢  KEEP OUT  ☢',1.6,'#ffd23f')};
+const left=()=>{try{const t=+localStorage.gta6nuke||0;return Math.max(0,CD-(Date.now()-t)/1000|0)}catch(e){return 0}};
+const pos=()=>Z.in?{x:Z.ox,z:Z.oz}:{x:P.x,z:P.z};
+window.bunkerMenu=function(){paused=1;M.className='';M.style.cssText='';const L=left(),g2=cops.filter(n=>n.yg&&!n.dead).length;let h='<h2>☢ Big Yahu\'s Bunker</h2><p style="opacity:.8">Side activity, not part of the story.</p>';
+ if(g2)h+='<p>Big Yahu\'s guards are still in here. Take them out first.</p>';
+ else if(Z.nt>0)h+='<p><b style="color:#ff5a4a">The nuke is armed! '+Math.ceil(Z.nt)+'s left. RUN!</b></p>';
+ else if(L)h+='<p>The launch system is rebooting. Come back in '+Math.ceil(L/60)+' min.</p>';
+ else h+='<p>Technician: "Big Yahu keeps a little insurance down here. For ₪'+COST.toLocaleString()+' I can forget I saw you type the launch code."</p><p>After arming you have <b>'+FUSE+' seconds</b> to get <b>'+NR+'m</b> away. Survive and Big Yahu\'s rivals pay you <b>₪'+PAY.toLocaleString()+'</b>. Get caught in the blast and you die'+(S.hc?' and <b>your save is erased (permadeath)</b>':'')+'.</p>'+(P.cash>=COST?'<button onclick="armNuke()">☢ Arm the nuke (₪'+COST.toLocaleString()+')</button>':'<p><i>You need ₪'+COST.toLocaleString()+'.</i></p>');
+ M.innerHTML=h+'<button onclick="back()">Leave</button>'};
+window.armNuke=function(){if(P.cash<COST||Z.nt>0||left())return;P.cash-=COST;Z.nt=FUSE;wanted=5.99;try{localStorage.gta6nuke=Date.now()}catch(e){}back();splash('NUKE ARMED','Get '+NR+'m away in '+FUSE+' seconds!','#ff3b30',3.5);say('The launch klaxon is blaring. GET OUT!')};
+const _sh13=shop;shop=function(b){if(b&&b.k=='yb')return bunkerMenu();_sh13(b)};
+const _eb13=enterB;enterB=function(b){_eb13(b);if(!Z.in||b.k!='yb'||Z.nt>0||left())return;for(let i=0;i<3;i++){const n=mkn(-6+i*6,8+(i%2)*2);Object.assign(n,{n:'YAHU GUARD',crim:1,yg:1,arm:1,hp:110,dmg:9,cl:'#222222',mn:0,a:PI});cops.push(n)}say("Big Yahu's guards: 'Nobody touches the button!'")};
+function detonate(){Z.nt=0;Z.nf=3.2;Z.nm=70;sk=12;const p=pos(),d=Math.hypot(p.x-YX,p.z-YZ);
+ const kill=a=>(a||[]).forEach(o=>{if(o==P.car||o.dead)return;if(Math.hypot(o.x-YX,o.z-YZ)<NR){if(o.ty!=null){o.hp=0;try{hitC(o,9999)}catch(e){}}else if(!(o.c&&o.c[4])){o.hp=0;o.dead=1}}});
+ if(Z.in){kill(Z.wn);kill(Z.wcar);kill(Z.wc)}else{kill(npcs);kill(cars);kill(cops)}
+ if(d<NR&&!S.god){if(P.car){P.car.hp=0}P.hp=0;Z.nd=1;splash('NUKED','You were inside the blast zone','#ff3b30',4)}
+ else{P.cash+=PAY;Z.nk=(Z.nk||0)+1;splash('KABOOM','Survived the blast · +₪'+PAY.toLocaleString(),'#ffb020',4);say('Big Yahu on the radio: "I said blow up the competition, not the whole Negev!"')}}
+const _u13=upd;upd=function(dt){_u13(dt);if(Z.nt>0){Z.nt-=dt;wanted=Math.max(wanted,4.5);if(Z.nt<=0)detonate()}if(Z.nm>0)Z.nm-=dt;if(Z.nf>0)Z.nf-=dt};
+const _go13=go;go=function(m){Z.nt=0;Z.nm=0;Z.nf=0;_go13(m)};
+const _dr13=draw;draw=function(){_dr13();if(!P||!on)return;
+ if(Z.nm>0&&!Z.in){const age=70-Z.nm,gr=Math.min(1,age/6),al=Math.min(1,Z.nm/8);const pt=(y,r,c)=>{const q=pj(YX,y,YZ);if(!(q[2]>2))return;const s=r*F/q[2];const gd=g.createRadialGradient(q[0],q[1],0,q[0],q[1],s);gd.addColorStop(0,c);gd.addColorStop(1,'rgba(60,30,20,0)');g.fillStyle=gd;g.beginPath();g.arc(q[0],q[1],s,0,7);g.fill()};
+  g.save();g.globalAlpha=al;for(let y=0;y<70*gr;y+=6)pt(y,9+y*.06,'rgba(120,80,60,.85)');const top=78*gr;pt(top+8,48*gr,'rgba(150,95,65,.85)');pt(top,40*gr,'rgba(255,160,70,.9)');pt(top-6,26*gr,'rgba(255,230,150,.8)');pt(2,70*gr,'rgba(150,110,80,.6)');g.restore()}
+ if(Z.nf>0){g.fillStyle='rgba(255,250,235,'+Math.min(1,Z.nf/1.6)+')';g.fillRect(0,0,W,H)}
+ if(Z.nt>0){const p=pos(),d=Math.hypot(p.x-YX,p.z-YZ)|0,safe=d>=NR;g.save();g.textAlign='center';g.font='bold 44px Anton,Impact';g.lineWidth=6;g.strokeStyle='#000';const t='☢ '+Math.ceil(Z.nt)+'s';g.strokeText(t,W/2,110);g.fillStyle=(performance.now()/300|0)%2?'#ff3b30':'#ffd23f';g.fillText(t,W/2,110);
+  g.font='bold 18px Arial';const s=safe?'SAFE DISTANCE ('+d+'m) · stay out!':'BLAST ZONE · '+d+'m / '+NR+'m · RUN!';g.lineWidth=4;g.strokeText(s,W/2,138);g.fillStyle=safe?'#5dff7a':'#ff6a5a';g.fillText(s,W/2,138);g.restore()}};
 })();
 </script>
 </body></html>

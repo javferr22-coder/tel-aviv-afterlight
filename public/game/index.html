@@ -995,4 +995,27 @@ const _in11=ins;ins=function(){_in11();M.innerHTML=M.innerHTML.replace('<button 
 mainM();
 
 </script><script>/* v12: built-in synth music fully disabled */synthPlay=function(){};synthTick=function(){};synthInit=function(){return 0};</script>
+<script>/* v12 patch: readable minimap with labeled places + landmark pins */
+(function(){
+const LM=()=>{const hq=bl.find(b=>b.k=='pd'),L=[];
+ if(hq){const d=door(hq);L.push({x:d.x,z:d.z,c:'#3a6bff',t:'P',n:'POLICE HQ'})}
+ if(Z.base)L.push({x:Z.base.x,z:Z.base.z,c:'#33ff66',t:'B',n:'MILITARY BASE'});
+ L.push({x:5*SZ,z:5*SZ,c:'#cfe3f2',t:'A',n:'AZRIELI'},{x:SZ,z:10*SZ,c:'#e2c48a',t:'T',n:'CLOCK TOWER'},{x:(PK.i0+PK.i1)/2*SZ,z:(PK.j0+PK.j1)/2*SZ,c:'#4cc35a',t:'Y',n:'YARKON PARK'});
+ if(typeof task!='undefined'&&task&&typeof tgt=='function'){const t=tgt();if(t&&isFinite(t.x))L.push({x:t.x,z:t.z,c:'#ffd23f',t:'★',n:'TARGET',big:1})}
+ return L};
+window.areaName=function(){if(Z.in)return 'Indoors';const i=P.x/SZ,j=P.z/SZ;if(i>=PK.i0-.5&&i<=PK.i1+.5&&j>=PK.j0-.5&&j<=PK.j1+.5)return 'Yarkon Park';
+ let best='',bd=1e9;ZL.forEach(z=>{const d=Math.hypot(z[1]-i,z[2]-j);if(d<bd){bd=d;best=z[0]}});return best+(P.x>5.5*SZ?' · Negev County':' · Tel Aviv')};
+const badge=(x,y,c,t,r)=>{g.fillStyle='#000a';g.beginPath();g.arc(x,y,r+1.5,0,7);g.fill();g.fillStyle=c;g.beginPath();g.arc(x,y,r,0,7);g.fill();g.fillStyle='#000';g.font='bold '+(r*1.5|0)+'px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText(t,x,y+.5);g.textBaseline='alphabetic'};
+const _mi13=mini;mini=function(){_mi13();if(!P)return;const k=.32*mz,X=78,Y=H-148,R=64,rel=(x,z)=>{const dx=x-P.x,dz=z-P.z;return[(dx*cos(P.a)-dz*sin(P.a))*k,-(dx*sin(P.a)+dz*cos(P.a))*k]};
+ if(!Z.in){g.save();g.beginPath();g.arc(X,Y,R,0,7);g.clip();
+  bl.forEach(b=>{if(b.k=='base'||b.k=='pd'||!KC[b.k])return;const d=door(b),p=rel(d.x,d.z);if(p[0]*p[0]+p[1]*p[1]>58*58)return;badge(X+p[0],Y+p[1],KC[b.k],KL[b.k],4.5)});g.restore();
+  LM().forEach(o=>{let p=rel(o.x,o.z);const d=Math.hypot(p[0],p[1]);if(d>R-7){p=[p[0]*(R-7)/d,p[1]*(R-7)/d];badge(X+p[0],Y+p[1],o.c,o.t,o.big?6:5)}else{badge(X+p[0],Y+p[1],o.c,o.t,o.big?6.5:5.5);g.font='bold 8px Arial';g.textAlign='center';g.lineWidth=2.5;g.strokeStyle='#000';g.strokeText(o.n,X+p[0],Y+p[1]-9);g.fillStyle='#fff';g.fillText(o.n,X+p[0],Y+p[1]-9)}});}
+ g.fillStyle='#000c';g.fillRect(0,Y+83,262,13);g.font='bold 10px Arial';g.textAlign='left';g.fillStyle='#fff';g.fillText('G gear C cars F food S spk X chop $ bank J jobs · N map',4,Y+93);
+ const an=areaName();g.font='bold 12px Arial';const w=g.measureText(an).width+14;g.fillStyle='#000b';g.fillRect(X-w/2,Y-R-20,w,16);g.fillStyle='#ffe27a';g.textAlign='center';g.fillText(an,X,Y-R-8);
+ };
+const _fm13=fullMap;fullMap=function(){_fm13();const w=Math.min(W,H)*.88,k=w/((N+.5)*SZ),X0=W/2-w/2,Y0=H/2-w/2,m=(x,z)=>[X0+(x+SZ/2)*k,Y0+w-(z+SZ/2)*k];
+ LM().forEach(o=>{const p=m(o.x,o.z);badge(p[0],p[1],o.c,o.t,o.big?9:8);g.font='bold 12px Arial';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#000';g.strokeText(o.n,p[0],p[1]-13);g.fillStyle='#fff';g.fillText(o.n,p[0],p[1]-13)});
+ g.font='bold 13px Arial';g.textAlign='center';g.fillStyle='#ffe27a';g.fillText('You are in: '+areaName()+'   ·   P Police HQ · B Military Base · A Azrieli · T Clock Tower · Y Yarkon Park · ★ current target',W/2,Y0-8)};
+})();
+</script>
 </body></html>

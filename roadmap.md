@@ -11,3 +11,8 @@
 - [x] More realistic, GTA-style look (sky, beach, landmarks, HUD, mission splash)
 - [x] More Israel themed (shekels, Hebrew signs, landmarks, radio, flags)
 - [x] One continuing story: extend the existing chapters, more difficulty, rewards, grind (garage, races, collectibles, daily challenges, completion %)
+- [ ] Police easier to escape and do less damage
+- [ ] City map (N): free mouse while open, ping locations
+- [ ] Camera can't tilt all the way up
+- [ ] Mouse sensitivity slider in Settings
+- [ ] More GTA-looking visuals (lighting/shading, better models)

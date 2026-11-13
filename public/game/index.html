@@ -1057,4 +1057,132 @@ const _dr13=draw;draw=function(){_dr13();if(!P||!on)return;
   g.font='bold 18px Arial';const s=safe?'SAFE DISTANCE ('+d+'m) · stay out!':'BLAST ZONE · '+d+'m / '+NR+'m · RUN!';g.lineWidth=4;g.strokeText(s,W/2,138);g.fillStyle=safe?'#5dff7a':'#ff6a5a';g.fillText(s,W/2,138);g.restore()}};
 })();
 </script>
+<script>/* v14 patch: easier police, free-mouse city map with waypoints, camera tilt limit, mouse sensitivity, GTA-style graphics */
+(function(){
+// ---- options kept outside the run save (survive permadeath)
+const OPK='gta6opt';try{const o=JSON.parse(localStorage[OPK]||'{}');S.ms=o.ms?cl(+o.ms,.1,3):1;S.gx=o.gx==null?1:+o.gx}catch(e){S.ms=1;S.gx=1}
+window.saveOpt=function(){try{localStorage[OPK]=JSON.stringify({ms:S.ms,gx:S.gx})}catch(e){}};
+window.setMS=function(v){S.ms=cl(+v||1,.1,3);saveOpt();const l=document.getElementById('msv');if(l)l.textContent=S.ms.toFixed(1)+'x'};
+const BK='<button onclick="back()">Back</button>';
+const _se14=settings;settings=function(){_se14();M.innerHTML=M.innerHTML.replace(BK,()=>'<label style="min-width:280px">Mouse sensitivity: <b id=msv>'+S.ms.toFixed(1)+'x</b><input type=range min=0.1 max=3 step=0.1 value='+S.ms+' oninput="setMS(this.value)" style="display:block;width:100%;margin-top:6px"></label><button onclick="S.gx^=1;saveOpt();settings()">GTA graphics (haze, sun shadows, color grade): '+(S.gx?'On':'Off')+'</button>'+BK)};
+const _in14=ins;ins=function(){_in14();M.innerHTML=M.innerHTML.replace(BK,()=>'<p><b>City map (N):</b> the mouse is free while the map is open and the world pauses. Click anywhere to drop a waypoint, click a place to ping it, right-click to remove it. N or Esc closes the map. Mouse sensitivity is in Settings.</p>'+BK)};
+
+// ---- camera: sensitivity + no more looking straight up
+const PMAX=.16,PMIN=-.32;
+onmousemove=e=>{if(!on||paused)return;Z.mx=e.clientX;Z.my=e.clientY;if(Z.fm)return;if(Z.sk>0){Z.sk--;return}const dx=e.movementX||0,dy=e.movementY||0;if(Math.abs(dx)>250||Math.abs(dy)>250)return;const k=.0025*(S.ms||1);if(P&&P.car)cyo+=dx*k;else cyaw+=dx*k;cpt=cl(cpt-dy*k,PMIN,PMAX)};
+const _cs14=camSet;camSet=function(c){cpt=cl(cpt,PMIN,PMAX);_cs14(c)};
+const _st14=steer;steer=function(dt){if(Z.fm)return;_st14(dt);cpt=cl(cpt,PMIN,PMAX)};
+
+// ---- city map: free mouse + waypoints
+const _lm14=lockM;lockM=function(){if(Z.fm)return;_lm14()};
+const _pm14=pm;pm=function(){if(Z.fm&&!paused)return;_pm14()};
+const openMap=()=>{Z.fm=1;try{if(document.pointerLockElement&&document.exitPointerLock)document.exitPointerLock()}catch(e){}};
+const closeMap=()=>{Z.fm=0;Z.lr=performance.now();Z.sk=2;_lm14()};
+const _k14=onkeydown;onkeydown=e=>{
+ if(on&&!paused&&Z.fm){if(!e.repeat&&(e.code=='KeyN'||e.code=='Escape'))closeMap();if(e.preventDefault)e.preventDefault();return}
+ if(e.code=='KeyN'&&on&&!paused&&!e.repeat&&!Z.in&&P){openMap();return}
+ _k14(e)};
+const MP=()=>{const w=Math.min(W,H)*.88,k=w/((N+.5)*SZ),X0=W/2-w/2,Y0=H/2-w/2;return{w,k,X0,Y0,m:(x,z)=>[X0+(x+SZ/2)*k,Y0+w-(z+SZ/2)*k],inv:(sx,sy)=>({x:(sx-X0)/k-SZ/2,z:(Y0+w-sy)/k-SZ/2})}};
+const places=()=>{const L=[];bl.forEach(b=>{if(b.k=='base')return;const d=door(b);L.push({x:d.x,z:d.z,n:b.n})});
+ if(Z.base)L.push({x:Z.base.x,z:Z.base.z,n:'Military Base'});L.push({x:5*SZ,z:5*SZ,n:'Azrieli Center'},{x:SZ,z:10*SZ,n:'Jaffa Clock Tower'});
+ if(typeof PK!='undefined')L.push({x:(PK.i0+PK.i1)/2*SZ,z:(PK.j0+PK.j1)/2*SZ,n:'Yarkon Park'});(Z.dl||[]).forEach(d=>L.push({x:d.x,z:d.z,n:'Dealer'}));
+ if(task&&typeof tgt=='function'){const t=tgt();if(t&&isFinite(t.x))L.push({x:t.x,z:t.z,n:'Current target'})}return L};
+const snap=(sx,sy)=>{const p=MP();let best=null,bd=15;places().forEach(o=>{const q=p.m(o.x,o.z),d=Math.hypot(q[0]-sx,q[1]-sy);if(d<bd){bd=d;best=o}});return best};
+const mpos=()=>Z.mx==null?null:[Z.mx*S.rs,Z.my*S.rs];
+function mapClick(e){const sx=e.clientX*S.rs,sy=e.clientY*S.rs,p=MP();
+ if(e.button==2){if(Z.wp){Z.wp=null;say('Waypoint removed.')}return}
+ if(sx<p.X0||sx>p.X0+p.w||sy<p.Y0||sy>p.Y0+p.w)return;
+ if(Z.wp){const q=p.m(Z.wp.x,Z.wp.z);if(Math.hypot(q[0]-sx,q[1]-sy)<12){Z.wp=null;say('Waypoint removed.');return}}
+ const s=snap(sx,sy),w=s?{x:s.x,z:s.z,n:s.n}:Object.assign(p.inv(sx,sy),{n:'Waypoint'});w.x=cl(w.x,LO,HI);w.z=cl(w.z,LO,HI);Z.wp=w;
+ say((s?'Pinged '+s.n:'Waypoint set')+' · '+(Math.hypot(w.x-P.x,w.z-P.z)|0)+'m away')}
+const _md14=cv.onmousedown;cv.onmousedown=e=>{if(on&&!paused&&Z.fm){mapClick(e);return}if(_md14)_md14(e)};
+const pin=(x,y,r)=>{g.fillStyle='#000';g.beginPath();g.arc(x,y-r,r+2,0,7);g.fill();g.fillStyle='#c04dff';g.beginPath();g.arc(x,y-r,r,0,7);g.fill();g.beginPath();g.moveTo(x-r*.7,y-r*.4);g.lineTo(x+r*.7,y-r*.4);g.lineTo(x,y+2);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(x,y-r,r*.38,0,7);g.fill()};
+function mapLayer(){const p=MP(),mp=mpos();g.save();
+ if(Z.wp){const a=p.m(P.x,P.z),b=p.m(Z.wp.x,Z.wp.z);g.setLineDash([7,6]);g.strokeStyle='#d98bff';g.lineWidth=3;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke();g.setLineDash([]);pin(b[0],b[1],9);
+  g.font='bold 12px Arial';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#000';const t=Z.wp.n+' · '+(Math.hypot(Z.wp.x-P.x,Z.wp.z-P.z)|0)+'m';g.strokeText(t,b[0],b[1]-24);g.fillStyle='#f0d0ff';g.fillText(t,b[0],b[1]-24)}
+ if(mp&&mp[0]>=p.X0&&mp[0]<=p.X0+p.w&&mp[1]>=p.Y0&&mp[1]<=p.Y0+p.w){const s=snap(mp[0],mp[1]);
+  if(s){const q=p.m(s.x,s.z);g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.arc(q[0],q[1],12,0,7);g.stroke()}
+  const w=s||p.inv(mp[0],mp[1]),t=(s?s.n:'Drop waypoint')+' · '+(Math.hypot(w.x-P.x,w.z-P.z)|0)+'m';g.font='bold 13px Arial';g.textAlign='left';const tw=g.measureText(t).width;
+  g.fillStyle='#000c';g.fillRect(mp[0]+14,mp[1]+8,tw+12,20);g.fillStyle='#fff';g.fillText(t,mp[0]+20,mp[1]+23)}
+ const y=Math.min(H-8,p.Y0+p.w+42);g.textAlign='center';g.font='bold 13px Arial';const t='Click: drop a waypoint · Click a place: ping it · Right-click: remove · N / Esc: close (the world is paused)';const tw=g.measureText(t).width;
+ g.fillStyle='#000b';g.fillRect(W/2-tw/2-8,y-15,tw+16,21);g.fillStyle='#d98bff';g.fillText(t,W/2,y);g.restore()}
+const _mi14=mini;mini=function(){_mi14();if(!P||!Z.wp||Z.in)return;const k=.32*mz,X=78,Y=H-148,R=64,dx=Z.wp.x-P.x,dz=Z.wp.z-P.z;let p=[(dx*cos(P.a)-dz*sin(P.a))*k,-(dx*sin(P.a)+dz*cos(P.a))*k];const d=Math.hypot(p[0],p[1]);if(d>R-8)p=[p[0]*(R-8)/d,p[1]*(R-8)/d];pin(X+p[0],Y+p[1]+5,5.5)};
+
+// ---- police: less damage, easier to lose
+let PD=0;const _hu14=hurt;hurt=function(d){_hu14(PD?d*PD:d)};
+const _ai14=ai;ai=function(n,dt){if(!n||!n.cop)return _ai14(n,dt);const o=PD;PD=n.army?.7:.45;try{_ai14(n,dt)}finally{PD=o}};
+const _cc14=chaseCar;chaseCar=function(c,dt){const o=PD;PD=c.en||c.army?.7:.45;try{_cc14(c,dt)}finally{PD=o}if(c!=P.car&&!c.en&&!c.air&&c.hp>0){const m=CT[c.ty][2]*.74;if(c.v>m)c.v=m}};
+const _iu14=inUpd;inUpd=function(dt){const o=PD;PD=.45;try{_iu14(dt)}finally{PD=o}};
+const _ch14=chase;chase=function(dt){_ch14(dt);if(!CH.on||CH.army||Z.w)return;if(!CH.ph)CH.t+=dt*.5;
+ let nd=1e9;cars.forEach(c=>{if(c.ch&&c.hp>0)nd=Math.min(nd,dist(c,P))});cops.forEach(n=>{if(!n.dead)nd=Math.min(nd,dist(n,P))});
+ Z.ev14=nd>70?(Z.ev14||0)+dt:Math.max(0,(Z.ev14||0)-dt*2);
+ if(Z.ev14>5&&!(Z.nt>0)){Z.ev14=0;wanted=Math.max(0,(wanted|0)-1+.5);if(stars()<2)endCh('You lost the cops!');else say('Out of sight! Wanted level dropped.')}
+ if(/survive 1 minute/.test(msg))msg=msg.replace('survive 1 minute','stay out of sight');};
+// ---- per-frame update: map pause, star fade, waypoint arrival, daylight curve
+const _u14=upd;upd=function(dt){if(Z.fm)return;_u14(dt);
+ if(!CH.on&&wt<=0&&wanted>0&&!(Z.nt>0))wanted=Math.max(0,wanted-dt/40);
+ if(Z.wp&&!Z.in&&Math.hypot(Z.wp.x-P.x,Z.wp.z-P.z)<14){say('You reached your waypoint.');Z.wp=null}
+ if(S.gx&&!Z.in){const t=(tm-6)/12,d=t>0&&t<1?sin(t*PI):0;nf=.33+.67*Math.min(1,d*1.7)}};
+const _go14=go;go=function(o){_go14(o);Z.fm=0;Z.wp=null;Z.ev14=0};
+
+// ---- GTA-style rendering: atmospheric haze, wall light gradients
+const FC=new Map();let FG=[255,217,168],FON=0,RVv=260;
+const pc=c=>{if(FC.has(c))return FC.get(c);let v=null;if(c.charCodeAt(0)==35&&c.length==7)v=hx(c);else if(c.startsWith('rgb('))v=c.slice(4,-1).split(',').map(Number);if(FC.size>6000)FC.clear();FC.set(c,v);return v};
+poly=function(P3,c,tx){const C=cos(ca),Sn=sin(ca),q=P3.map(p=>{const dx=p[0]-cx,dz=p[2]-cz;return[dx*C-dz*Sn,p[1]-cy,dx*Sn+dz*C]}),o=[];
+ for(let i=0;i<q.length;i++){const a=q[i],b=q[(i+1)%q.length],ia=a[2]>.3,ib=b[2]>.3;if(ia)o.push(a);if(ia!=ib){const t=(.3-a[2])/(b[2]-a[2]);o.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,.3])}}
+ if(o.length<3)return;g.beginPath();let y0=1e9,y1=-1e9,dz=1e9;o.forEach((p,i)=>{const sx=W/2+p[0]/p[2]*F,sy=HZ-p[1]/p[2]*F;g[i?'lineTo':'moveTo'](sx,sy);if(sy<y0)y0=sy;if(sy>y1)y1=sy;if(p[2]<dz)dz=p[2]});g.closePath();
+ let fill=c;if(FON&&typeof c=='string'){const v=pc(c);if(v){let f=cl((dz-45)/(RVv-45),0,1);f=Math.pow(f,1.1)*.9;
+   const r=v[0]+(FG[0]-v[0])*f,gg=v[1]+(FG[1]-v[1])*f,b=v[2]+(FG[2]-v[2])*f;
+   if(tx&&S.q&&dz<170&&P3.length==4&&P3[0][1]!=P3[2][1]&&y1-y0>10){const gr=g.createLinearGradient(0,y1,0,y0),s=(k)=>'rgb('+Math.min(255,r*k|0)+','+Math.min(255,gg*k|0)+','+Math.min(255,b*k|0)+')';gr.addColorStop(0,s(.6));gr.addColorStop(.18,s(.88));gr.addColorStop(1,s(1.1));fill=gr}
+   else if(f>.01)fill='rgb('+(r|0)+','+(gg|0)+','+(b|0)+')'}}
+ g.fillStyle=fill;g.fill();if(tx&&S.tex){g.globalAlpha=.6;g.fillStyle=S.tex;g.fill();g.globalAlpha=1}};
+
+// ---- buildings: plinth, shop-front glass, cornice, Israeli rooftop solar water heaters
+const sides=(x,z,hw,hl,y0,y1,c,emi)=>{const Q=[[x-hw,z-hl],[x+hw,z-hl],[x+hw,z+hl],[x-hw,z+hl]];for(let i=0;i<4;i++){const p=Q[i],q=Q[(i+1)%4],nx=q[1]-p[1],nz=p[0]-q[0];if((cx-p[0])*nx+(cz-p[1])*nz>0)poly([[p[0],y0,p[1]],[q[0],y0,q[1]],[q[0],y1,q[1]],[p[0],y1,p[1]]],emi?c:sh(c,.65+.35*(nx*.6+nz*.8)/Math.hypot(nx,nz)))}};
+const lt=(c,k)=>'#'+hx(c).map(v=>('0'+Math.min(255,v*k|0).toString(16)).slice(-2)).join('');
+function gtaB(b){const x=(b.x0+b.x1)/2,z=(b.z0+b.z1)/2,hw=(b.x1-b.x0)/2,hl=(b.z1-b.z0)/2;obox(x,z,hw,hl,0,b.h,0,b.c,1);
+ if(S.gx&&b.k!='base'){const d=Math.hypot(Math.max(b.x0-cx,0,cx-b.x1),Math.max(b.z0-cz,0,cz-b.z1));
+  if(d<150){sides(x,z,hw+.08,hl+.08,0,.45,lt(b.c,.55));const lit=nf<.62&&b.id%3!=1;sides(x,z,hw+.05,hl+.05,.45,1.95,lit?'#ffd38a':'#30414f',lit);
+   sides(x,z,hw+.45,hl+.45,b.h,b.h+.55,lt(b.c,1.12));sides(x,z,hw+.05,hl+.05,b.h+.55,b.h+1.2,lt(b.c,.92))}
+  if(d<170&&b.h<32&&cy<b.h+30){const n=1+(b.id%3);for(let i=0;i<n;i++){const u=x-hw*.55+i*hw*.5,v=z+hl*(.25-(i%2)*.4);obox(u,v,.5,1.1,b.h+1.2,b.h+1.75,0,'#e8e8e2');obox(u-1.4,v,.9,1.1,b.h+1.2,b.h+1.4,0,'#1f3550');obox(u+.3,v,.06,.06,b.h+1.2,b.h+2.3,0,'#777777')}}}
+ sign(b)}
+
+// ---- sun: building shadows on the ground + lens flare
+const sun=()=>{const t=(tm-6)/12;if(!(t>0&&t<1))return null;const a=PI/2+t*PI,e=sin(t*PI)*.9;return{dx:sin(a),dz:cos(a),e,t}};
+const hull=pts=>{pts.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]),lo=[],up=[];for(const p of pts){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}for(let i=pts.length-1;i>=0;i--){const p=pts[i];while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}up.pop();lo.pop();return lo.concat(up)};
+function shadows(){const s=sun();if(!s||!S.shd)return;const al=.34*Math.min(1,s.e*3),L=Math.min(2.6,1/Math.tan(Math.max(.22,s.e)));if(al<.02)return;const col='rgba(10,14,30,'+al.toFixed(3)+')';
+ bl.forEach(b=>{if(b.k=='base')return;const hc=Math.max(Math.abs((b.x0+b.x1)/2-cx),Math.abs((b.z0+b.z1)/2-cz));if(hc>RVv)return;const len=Math.min(70,b.h*L),ox=-s.dx*len,oz=-s.dz*len;
+  const F4=[[b.x0,b.z0],[b.x1,b.z0],[b.x1,b.z1],[b.x0,b.z1]],hp=hull(F4.concat(F4.map(p=>[p[0]+ox,p[1]+oz])));poly(hp.map(p=>[p[0],.04,p[1]]),col)});
+ // curb shadows along sidewalks
+ if(S.q)for(let i=0;i<N;i++)for(let j=0;j<N;j++){const x=i*SZ,z=j*SZ;if(Math.abs(x-cx)>150||Math.abs(z-cz)>150)continue;const e=B/2+3;
+  [[x-e,z-e,x+e,z-e,0,-.7],[x+e,z-e,x+e,z+e,.7,0],[x+e,z+e,x-e,z+e,0,.7],[x-e,z+e,x-e,z-e,-.7,0]].forEach(([a,b,c,d,u,v])=>poly([[a,.03,b],[c,.03,d],[c+u,.03,d+v],[a+u,.03,b+v]],'rgba(0,0,0,.28)'))}}
+const sunOcc=s=>{const vx=s.dx,vz=s.dz,te=Math.tan(s.e);for(const b of bl){if(Math.abs((b.x0+b.x1)/2-cx)>RVv||Math.abs((b.z0+b.z1)/2-cz)>RVv)continue;let t0=0,t1=1e9;
+  for(const[p,v,lo,hi]of[[cx,vx,b.x0,b.x1],[cz,vz,b.z0,b.z1]]){if(Math.abs(v)<1e-6){if(p<lo||p>hi){t0=1e9;break}continue}let a=(lo-p)/v,c=(hi-p)/v;if(a>c){const k=a;a=c;c=k}t0=Math.max(t0,a);t1=Math.min(t1,c)}
+  if(t0<=t1&&t0<1e8&&cy+t0*te<b.h+1.2)return 1}return 0};
+function flare(){const s=sun();if(!s||s.e<.04)return;const rx=s.dx*cos(ca)-s.dz*sin(ca),rz=s.dx*sin(ca)+s.dz*cos(ca);if(rz<=.2)return;const X=W/2+rx/rz*F,Y=HZ-Math.tan(s.e)/rz*F;if(X<-W*.2||X>W*1.2||Y<-H*.3||Y>HZ)return;if(sunOcc(s))return;
+ const k=Math.min(1,rz)*Math.min(1,s.e*4),vx=W/2-X,vy=H/2-Y;g.save();g.globalCompositeOperation='lighter';
+ const st=g.createLinearGradient(X-W*.45,0,X+W*.45,0);st.addColorStop(0,'rgba(255,200,140,0)');st.addColorStop(.5,'rgba(255,225,180,'+(.22*k)+')');st.addColorStop(1,'rgba(255,200,140,0)');g.fillStyle=st;g.fillRect(X-W*.45,Y-2,W*.9,4);
+ const gl=g.createRadialGradient(X,Y,0,X,Y,H*.45);gl.addColorStop(0,'rgba(255,240,210,'+(.28*k)+')');gl.addColorStop(1,'rgba(255,200,140,0)');g.fillStyle=gl;g.fillRect(X-H*.45,Y-H*.45,H*.9,H*.9);
+ [[.45,.035,'255,190,120',.12],[.75,.02,'140,220,255',.14],[1.25,.06,'255,140,200',.07],[1.6,.03,'180,255,180',.1],[1.9,.09,'255,210,140',.05]].forEach(([t,r,c,a])=>{g.fillStyle='rgba('+c+','+(a*k)+')';g.beginPath();g.arc(X+vx*t,Y+vy*t,H*r,0,7);g.fill()});g.restore()}
+
+// ---- characters: hair, police caps, army helmets
+const HC=['#1a1410','#2e1c10','#5a3a1e','#0d0d0d','#8a6a3a','#3a2a20'];
+const _sp14=spr;spr=function(o){_sp14(o);if(!S.gx||o.dead||o.me||o.ty!=null)return;const dd=Math.hypot(o.x-cx,o.z-cz);if(dd>45)return;const s=o.sc||1,a=o.a||0,y=o.y||0,fx=sin(a),fz=cos(a),
+ pt=(f,hw,hl,y0,y1,c)=>obox(o.x+fx*f*s,o.z+fz*f*s,hw*s,hl*s,y+y0*s,y+y1*s,a,c);
+ if(o.cop&&o.army)pt(0,.19,.19,1.74,1.92,'#3e4a26');else if(o.cop){pt(0,.18,.18,1.76,1.9,'#14213d');pt(.12,.15,.09,1.76,1.8,'#0b1426')}
+ else{if(o.hc==null)o.hc=HC[(Math.abs(o.x*7+o.z*13)|0)%HC.length];pt(-.02,.17,.17,1.78,1.87,o.hc)}};
+
+// ---- draw: haze colour, default building model, sun shadows, waypoint beam, cursor
+const _xt14=xtra;xtra=function(it,dc,RV){_xt14(it,dc,RV);if(S.gx&&!Z.in)it.push([9.5e4,shadows]);
+ if(Z.wp){const w=Z.wp;it.push([dc(w),()=>{const c='rgba(200,90,255,.5)';poly([[w.x-.7,0,w.z],[w.x+.7,0,w.z],[w.x+.7,80,w.z],[w.x-.7,80,w.z]],c);poly([[w.x,0,w.z-.7],[w.x,0,w.z+.7],[w.x,80,w.z+.7],[w.x,80,w.z-.7]],c)}])}};
+const _po14=post;post=function(){_po14();if(!S.gx||Z.in||!P)return;const t=(tm-6)/12,day=t>0&&t<1?sin(t*PI):0;g.save();g.globalCompositeOperation='soft-light';const gr=g.createLinearGradient(0,0,0,H);
+ if(day>0){const w=1-Math.min(1,day*1.4);gr.addColorStop(0,'rgba(255,'+(175-w*50|0)+','+(95-w*50|0)+','+(.32+w*.3).toFixed(2)+')');gr.addColorStop(.5,'rgba(128,128,128,0)');gr.addColorStop(1,'rgba(10,95,120,'+(.3-w*.08).toFixed(2)+')')}
+ else{gr.addColorStop(0,'rgba(30,60,170,.55)');gr.addColorStop(1,'rgba(10,20,70,.5)')}
+ g.fillStyle=gr;g.fillRect(0,0,W,H);g.restore();if(S.fx)flare()};
+const _hu15=hud;hud=function(){_hu15();if(!P||!on)return;if(Z.fm){mapLayer();return}
+ if(Z.wp&&!Z.in){const p=pj(Z.wp.x,4,Z.wp.z),d=Math.hypot(Z.wp.x-P.x,Z.wp.z-P.z)|0;if(p[2]>1&&p[0]>0&&p[0]<W){pin(p[0],Math.max(30,Math.min(H-120,p[1])),8);g.save();g.font='bold 13px Arial';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#000';g.strokeText(d+'m',p[0],Math.max(30,Math.min(H-120,p[1]))+18);g.fillStyle='#f0d0ff';g.fillText(d+'m',p[0],Math.max(30,Math.min(H-120,p[1]))+18);g.restore()}}};
+const _dr14=draw;draw=function(){if(P){RVv=S.q?260:150;FON=S.gx&&S.fog&&!Z.in?1:0;const h=hx(cx>5.5*SZ?'#ffc27a':'#ffd9a8');FG=[h[0]*nf,h[1]*nf,h[2]*nf];bl.forEach(b=>{if(!b.dr)b.dr=gtaB})}
+ _dr14();if(on&&!paused&&Z.fm)cv.style.cursor='crosshair'};
+})();
+</script>
 </body></html>

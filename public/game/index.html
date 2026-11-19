@@ -1272,4 +1272,23 @@ let LT=0,SC=0;const gov=()=>{const t=performance.now();if(LT){FT=FT*.95+Math.min
 const _dr15=draw;draw=function(){sunUpd();gov();_dr15()};
 })();
 </script>
+<script>
+// ==== v16 patch: Javier is always the fastest runner in Tel Aviv ====
+(function(){
+const JN='Javier Ferreira';
+const R=(a,b)=>Math.round((a+Math.random()*(b-a))*100)/100;
+const FSP=()=>R(1.6,1.75); // always beats Cameron's MAX-stats 1.5 speed
+const oldRoll=window.jRoll;
+window.jRoll=()=>{const j=oldRoll();j.t=2;j.spm=FSP();return j};
+const jFix=()=>{if(!Z.js)Z.js=window.jRoll();else if(Z.js.spm<1.55){Z.js.spm=FSP();Z.js.t=2}};
+const jAp=()=>{if(P&&P.n==JN&&Z.js)Object.assign(P,{spm:Z.js.spm,dm:Z.js.dm})};
+const _go16=go;go=function(o){_go16(o);jFix();jAp()};
+const _sw16=swap;swap=function(i){_sw16(i);if(i<0)jAp()};
+const relab=t=>t.split('Elite · Speed').join('Fastest · Speed');
+const _hu16=hud;hud=function(){if(Z.js&&Z.js.spm>=1.55&&typeof msg=='string')msg=relab(msg);_hu16()};
+const _ch16=chars;chars=function(){_ch16();if(Z.js&&Z.js.spm>=1.55)M.innerHTML=relab(M.innerHTML)};
+const _pm16=pm;pm=function(){_pm16();if(paused&&Z.js&&Z.js.spm>=1.55)M.innerHTML=relab(M.innerHTML)};
+const _in16=ins;ins=function(){_in16();M.innerHTML=M.innerHTML.replace("every new life rolls Javier's speed, strength and toughness. Most lives are Solid or Elite; now and then you get an Average one.",()=>"Javier is always the fastest runner in Tel Aviv - faster even than MAX-stats Cameron. His strength and toughness are still rolled each life.")};
+})();
+</script>
 </body></html>

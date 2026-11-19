@@ -16,3 +16,6 @@
 - [x] Camera can't tilt all the way up
 - [x] Mouse sensitivity slider in Settings
 - [x] More GTA-looking visuals (lighting/shading, better models)
+- [x] More realistic shaders (sun-driven lighting, glass reflections, cast shadows, bloom, sea glitter)
+- [x] Mouse can look up (but never only sky)
+- [x] Default character (Javier) has decent stats most lives
